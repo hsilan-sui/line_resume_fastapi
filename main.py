@@ -286,11 +286,21 @@ def build_clinic_flex(results):
                     "imageUrl": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_34_article.png",
                     "action": {
                         "type": "uri",
-                        "label": "我想查找政府合作全台心理諮商網站",
+                        "label": "查找政府合作全台心理諮商網站",
                         "uri": "https://counseling-map.vercel.app/"
                     }
+                },
+                {
+                    "type": "action",
+                    "imageUrl": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_17_bookmark.png",
+                    "action": {
+                        "type": "message",
+                        "label": "回到作品集",
+                        "text": "作品集"
+                    }
                 }
-            ]
+            ],
+            
         }
     }
 
