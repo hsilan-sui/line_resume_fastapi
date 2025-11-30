@@ -278,6 +278,19 @@ def build_clinic_flex(results):
         "contents": {
             "type": "carousel",
             "contents": bubbles
+        },
+        "quickReply": {
+            "items": [
+                {
+                    "type": "action",
+                    "imageUrl": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_34_article.png",
+                    "action": {
+                        "type": "uri",
+                        "label": "我想查找政府合作全台心理諮商網站",
+                        "uri": "https://counseling-map.vercel.app/"
+                    }
+                }
+            ]
         }
     }
 
@@ -304,6 +317,8 @@ def reply_message(reply_token, messages):
     print(res.status_code)
     print(res.text)
 
+def filter_available(clinic_list):
+    return [c for c in clinic_list if c.get("has_quota") is True]
 
 
 def build_resume_flex():
@@ -635,8 +650,12 @@ async def webhook(request: Request):
             key=lambda c: haversine(user_lat, user_lng, c["lat"], c["lng"])
         )
 
+        available = filter_available(ranked)     # ⭐ 只保留有名額
+
+
+    
         # ⭐ 直接給全部（build_clinic_flex會自動限制12）
-        reply_message(reply_token, build_clinic_flex(ranked))
+        reply_message(reply_token, build_clinic_flex(available))
 
         return {"ok": True}
 
@@ -663,7 +682,8 @@ async def webhook(request: Request):
         # 模糊診所名稱 → 已經會抓前 5（可改 12）
         if qtype == "clinic_keyword":
             matched = fuzzy_match(msg)
-            reply_message(reply_token, build_clinic_flex(matched))
+            available = filter_available(matched)    # ⭐ 只保留有名額
+            reply_message(reply_token, build_clinic_flex(available))
             return {"ok": True}
 
         # 地址 / 行政區 / 地標 → 回傳最近 12 間
@@ -682,7 +702,9 @@ async def webhook(request: Request):
                 key=lambda c: haversine(lat, lng, c["lat"], c["lng"])
             )
 
-            reply_message(reply_token, build_clinic_flex(ranked))
+            available = filter_available(ranked)     # ⭐ 只保留有名額
+
+            reply_message(reply_token, build_clinic_flex(available))
             return {"ok": True}
 
         reply_message(reply_token, build_resume_flex())
