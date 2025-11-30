@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import requests
 import math
 import os
+import re
 from difflib import SequenceMatcher
 from urllib.parse import quote
 
@@ -78,67 +79,199 @@ def classify_input(text: str):
 # ============
 # Flex Card ((Upgraded — top 12 clinics))
 # ============
-def build_clinic_flex(results):
-    bubbles = []
-    
-    # LINE Carousel 上限：12 個 bubbles
-    top_results = results[:12]
 
-    for c in top_results:
-        # 使用完整地址提高導航精準度
-        address_query = quote(c["address"])
-        map_url = f"https://www.google.com/maps/search/?api=1&query={address_query}"
 
-        bubble = {
-            "type": "bubble",
-            "size": "mega",
-            "body": {
-                "type": "box",
-                "layout": "vertical",
-                "contents": [
-                    {
-                        "type": "text",
-                        "text": c["org_name"],
-                        "weight": "bold",
-                        "size": "lg",
-                        "wrap": True
-                    },
-                    {
-                        "type": "text",
-                        "text": c["address"],
-                        "wrap": True,
-                        "size": "sm",
-                        "margin": "md"
-                    },
-                    {
-                        "type": "text",
-                        "text": f"電話：{c.get('phone', '無')}",
-                        "size": "sm",
-                        "margin": "sm"
-                    },
-                ]
-            },
-            "footer": {
-                "type": "box",
-                "layout": "vertical",
-                "spacing": "sm",
-                "contents": [
-                    {
-                        "type": "button",
-                        "style": "primary",
-                        "action": {
-                            "type": "uri",
-                            "label": "導航到這裡",
-                            "uri": map_url
+import re
+from urllib.parse import quote
+
+def build_clinic_flex_item(c):
+    # 狀態
+    status_text = "有名額" if c["has_quota"] else "無名額"
+    status_color = "#4CAF50" if c["has_quota"] else "#F44336"
+
+    tele = "支援遠距" if c.get("teleconsultation") else "無遠距"
+
+    # Google Maps
+    address_query = quote(c["address"])
+    map_url = f"https://www.google.com/maps/search/?api=1&query={address_query}"
+
+    # ============
+    # 電話安全清洗
+    # ============
+    phone_raw = (c.get("phone") or "").split("、")[0].strip()
+    phone_clean = re.sub(r"[^0-9+]", "", phone_raw)
+    phone_uri = f"tel:{phone_clean}" if phone_clean else "tel:000"
+
+    # ============
+    # 官網 URL fallback（處理 None、空字串、不合法網址）
+    # ============
+    url = c.get("org_url") or ""
+    url = str(url).strip()              # 強制變字串
+    if not (url.startswith("http://") or url.startswith("https://")):
+        # 用 Google 搜尋診所名稱當 fallback
+        url = "https://google.com/search?q=" + quote(c["org_name"])
+
+    return {
+        "type": "bubble",
+        "size": "mega",
+        "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+
+                # 標題列
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "backgroundColor": "#22c55e",
+                    "paddingAll": "12px",
+                    "cornerRadius": "md",
+                    "contents": [
+                        {
+                            "type": "text",
+                            "text": c["org_name"],
+                            "weight": "bold",
+                            "size": "lg",
+                            "color": "#ffffff"
                         }
-                    }
-                ]
-            }
+                    ]
+                },
+
+                # 地址 & 電話
+                {
+                    "type": "box",
+                    "layout": "vertical",
+                    "margin": "md",
+                    "spacing": "sm",
+                    "contents": [
+                        {
+                            "type": "text",
+                            "text": f"📍 {c['address']}",
+                            "wrap": True,
+                            "size": "sm"
+                        },
+                        {
+                            "type": "text",
+                            "text": f"📞 {c['phone']}",
+                            "size": "sm",
+                            "color": "#1d4ed8",
+                            "action": {
+                                "type": "uri",
+                                "uri": phone_uri
+                            }
+                        }
+                    ]
+                },
+
+                # 狀態列
+                {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "margin": "md",
+                    "spacing": "sm",
+                    "contents": [
+                        {
+                            "type": "text",
+                            "text": f"🩺 {status_text}",
+                            "color": status_color,
+                            "weight": "bold",
+                            "size": "sm"
+                        },
+                        {
+                            "type": "text",
+                            "text": f"｜ {tele}",
+                            "size": "sm",
+                            "color": "#6b7280"
+                        }
+                    ]
+                },
+
+                # 名額 badge
+                {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "margin": "md",
+                    "contents": [
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "backgroundColor": "#3b82f6",
+                            "cornerRadius": "50px",
+                            "paddingAll": "6px",
+                            "contents": [
+                                {
+                                    "type": "text",
+                                    "text": f"本週 {c['this_week']}",
+                                    "size": "sm",
+                                    "color": "#ffffff",
+                                    "align": "center"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "margin": "md",
+                            "backgroundColor": "#f59e0b",
+                            "cornerRadius": "50px",
+                            "paddingAll": "6px",
+                            "contents": [
+                                {
+                                    "type": "text",
+                                    "text": f"下週 {c['next_week']}",
+                                    "size": "sm",
+                                    "color": "#ffffff",
+                                    "align": "center"
+                                }
+                            ]
+                        }
+                    ]
+                },
+
+                # 更新日期
+                {
+                    "type": "text",
+                    "text": f"更新：{c['edit_date']}",
+                    "size": "xs",
+                    "margin": "md",
+                    "color": "#9ca3af"
+                }
+            ]
+        },
+
+        # footer: 官網 + 地圖
+        "footer": {
+            "type": "box",
+            "layout": "horizontal",
+            "contents": [
+                {
+                    "type": "button",
+                    "style": "primary",
+                    "color": "#d946ef",
+                    "action": {
+                        "type": "uri",
+                        "label": "官網",
+                        "uri": url
+                    },
+                    "height": "sm"
+                },
+                {
+                    "type": "button",
+                    "style": "secondary",
+                    "action": {
+                        "type": "uri",
+                        "label": "地圖",
+                        "uri": map_url
+                    },
+                    "height": "sm"
+                }
+            ]
         }
+    }
 
-        bubbles.append(bubble)
 
-    # 最終回傳 Carousel（最多 12 個）
+def build_clinic_flex(results):
+    bubbles = [build_clinic_flex_item(c) for c in results[:12]]
     return {
         "type": "flex",
         "altText": "心理諮商診所查詢結果",
@@ -156,6 +289,10 @@ def reply_message(reply_token, messages):
         "Authorization": f"Bearer {os.getenv('LINE_CHANNEL_ACCESS_TOKEN')}",
     }
 
+    # ⭐ 如果 messages 是 dict（單筆）→ 包成 list
+    if isinstance(messages, dict):
+        messages = [messages]
+
     body = {
         "replyToken": reply_token,
         "messages": messages
@@ -166,6 +303,7 @@ def reply_message(reply_token, messages):
     print("=== LINE API 回應 ===")
     print(res.status_code)
     print(res.text)
+
 
 
 def build_resume_flex():
@@ -498,7 +636,8 @@ async def webhook(request: Request):
         )
 
         # ⭐ 直接給全部（build_clinic_flex會自動限制12）
-        reply_message(reply_token, [build_clinic_flex(ranked)])
+        reply_message(reply_token, build_clinic_flex(ranked))
+
         return {"ok": True}
 
     # -------------------------------------------------
@@ -511,11 +650,11 @@ async def webhook(request: Request):
         print(f"👉 使用者訊息：{msg}")
 
         if "作品集" in msg:
-            reply_message(reply_token, [build_portfolio_carousel()])
+            reply_message(reply_token, build_portfolio_carousel())
             return {"ok": True}
 
         if "心理諮商" in msg or "諮商" in msg:
-            reply_message(reply_token, [build_counseling_entry()])
+            reply_message(reply_token, build_counseling_entry())
             return {"ok": True}
 
         qtype = classify_input(msg)
@@ -524,7 +663,7 @@ async def webhook(request: Request):
         # 模糊診所名稱 → 已經會抓前 5（可改 12）
         if qtype == "clinic_keyword":
             matched = fuzzy_match(msg)
-            reply_message(reply_token, [build_clinic_flex(matched)])
+            reply_message(reply_token, build_clinic_flex(matched))
             return {"ok": True}
 
         # 地址 / 行政區 / 地標 → 回傳最近 12 間
@@ -543,10 +682,10 @@ async def webhook(request: Request):
                 key=lambda c: haversine(lat, lng, c["lat"], c["lng"])
             )
 
-            reply_message(reply_token, [build_clinic_flex(ranked)])
+            reply_message(reply_token, build_clinic_flex(ranked))
             return {"ok": True}
 
-        reply_message(reply_token, [build_resume_flex()])
+        reply_message(reply_token, build_resume_flex())
         return {"ok": True}
 
     return {"ok": True}
