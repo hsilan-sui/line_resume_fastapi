@@ -69,6 +69,10 @@ async def webhook(request: Request):
             reply_message(reply_token, build_portfolio_carousel())
             return {"ok": True}
 
+        if "履歷" in msg:
+            reply_message(reply_token, build_resume_flex())
+            return {"ok": True}
+
         if "心理諮商" in msg or "諮商" in msg:
             reply_message(reply_token, build_counseling_entry())
             return {"ok": True}
@@ -104,7 +108,5 @@ async def webhook(request: Request):
             reply_message(reply_token, build_clinic_flex(available))
             return {"ok": True}
 
-        reply_message(reply_token, build_resume_flex())
-        return {"ok": True}
 
     return {"ok": True}

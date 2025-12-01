@@ -1,7 +1,7 @@
 # app/utils/fuzzy.py
 # 模糊比對clinics資料中的診所名稱
 from difflib import SequenceMatcher
-
+from app.data.clinic_loader import clinics
 # ============
 # fuzzy_match()
 # ============

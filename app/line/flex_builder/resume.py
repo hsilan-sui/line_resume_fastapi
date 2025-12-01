@@ -16,89 +16,389 @@
 def build_resume_flex():
     flex = {
         "type": "flex",
-        "altText": "Sui｜互動式履歷作品集",
+        "altText": "Sui｜互動式履歷首頁",
         "contents": {
             "type": "bubble",
-            "size": "mega",
-            # Hero（形象照片）=> 「個人品牌封面」
-            "hero": {
-                "type": "image",
-                "url": "https://i.imgur.com/8eOeOZQ.jpeg",
-                "size": "full",
-                "aspectRatio": "20:13", #適合介於橫幅與方圖間的視覺比例
-                "aspectMode": "cover" #讓圖像裁切得乾淨
-            },
-            ## Body（個人Title & 定位）
             "body": {
                 "type": "box",
                 "layout": "vertical",
                 "contents": [
-                    { # Title & 定位=> 看 1 秒就知道我會做什麼
-                        "type": "text",
-                        "text": "Sui | Backend × AI × Automation",
-                        "weight": "bold",
-                        "size": "lg"
+
+                    # ======================
+                    # 1) Hero Image（全版背景）
+                    # ======================
+                    {
+                        "type": "image",
+                        "url": "https://images.unsplash.com/photo-1503264116251-35a269479413?q=80&w=1536",
+                        "size": "full",
+                        "aspectMode": "cover",
+                        "aspectRatio": "2:3",
+                        "gravity": "top"
                     },
-                    { # 小副標（作品集類型）
-                        "type": "text",
-                        "text": "互動式履歷作品集｜LINE OA",
-                        "size": "sm",
-                        "color": "#888888",
-                        "margin": "sm"
+
+                    # ======================
+                    # 2) Overlay 資訊卡（底部黑透明）
+                    # ======================
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+
+                            # --- 個人定位職稱 ---
+                            {
+                                "type": "text",
+                                "text": "Backend / AI Agent Engineer",
+                                "size": "md",
+                                "color": "#ffffff",
+                                "weight": "bold",
+                                "wrap": True
+                            },
+
+                            # --- 技能快速摘要 ---
+                            {
+                                "type": "text",
+                                "text": "Node.js｜FastAPI｜Playwright｜AI Agents｜LINE Bot",
+                                "color": "#ffffffcc",
+                                "size": "sm",
+                                "wrap": True,
+                                "margin": "md"
+                            },
+                            # --- 技能能力指標（icon + 標籤） ---
+                            {
+                                "type": "box",
+                                "layout": "vertical",
+                                "spacing": "sm",
+                                "margin": "md",
+                                "contents": [
+                                    {
+                                        "type": "box",
+                                        "layout": "baseline",
+                                        "contents": [
+                                            {"type": "icon", "url": "https://developers-resource.landpress.line.me/fx/img/restaurant_regular_32.png"},
+                                            {
+                                                "type": "text",
+                                                "text": "API Automation",
+                                                "weight": "bold",
+                                                "margin": "sm",
+                                                "flex": 0,
+                                                "color": "#ffffff"
+                                            },
+                                            {
+                                                "type": "text",
+                                                "text": "專長",
+                                                "size": "sm",
+                                                "align": "end",
+                                                "color": "#ffffff80"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "box",
+                                        "layout": "baseline",
+                                        "contents": [
+                                            {"type": "icon", "url": "https://developers-resource.landpress.line.me/fx/img/restaurant_large_32.png"},
+                                            {
+                                                "type": "text",
+                                                "text": "AI Agents",
+                                                "weight": "bold",
+                                                "margin": "sm",
+                                                "flex": 0,
+                                                "color": "#ffffff"
+                                            },
+                                            {
+                                                "type": "text",
+                                                "text": "主力",
+                                                "size": "sm",
+                                                "align": "end",
+                                                "color": "#ffffff80"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            # --- CTA（查看作品集） ---
+                            {
+                                "type": "box",
+                                "layout": "vertical",
+                                "contents": [
+                                    {"type": "filler"},
+                                    {
+                                        "type": "box",
+                                        "layout": "baseline",
+                                        "contents": [
+                                            {"type": "filler"},
+                                            {
+                                                "type": "text",
+                                                "text": "查看作品集",
+                                                "color": "#ffffff",
+                                                "flex": 0,
+                                                "size": "sm"
+                                            },
+                                            {"type": "filler"}
+                                        ],
+                                        "spacing": "sm"
+                                    },
+                                    {"type": "filler"}
+                                ],
+                                "borderWidth": "1px",
+                                "cornerRadius": "4px",
+                                "spacing": "sm",
+                                "borderColor": "#ffffff",
+                                "margin": "xxl",
+                                "height": "40px",
+                                "action": {
+                                    "type": "message",
+                                    "text": "作品集"
+                                }
+                            }
+                        ],
+                        "position": "absolute",
+                        "offsetBottom": "0px",
+                        "offsetStart": "0px",
+                        "offsetEnd": "0px",
+                        "backgroundColor": "#000000B3",
+                        "paddingAll": "20px"
                     },
-                    { # 分隔線
-                        "type": "separator",
-                        "margin": "lg"
-                    },
-                    { # 自我介紹（重點技能一句話|技能總覽）
-                        "type": "text",
-                        "text": "特色：FastAPI、Python、自動化、爬蟲、AI Agent、LINE OA 整合",
-                        "wrap": True,
-                        "size": "sm",
-                        "margin": "md"
+
+                   # ======================
+                    # 3) 左上角品牌 Badge（姓名）
+                    # ======================
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            {
+                                "type": "text",
+                                "text": "游方箏 | Sui",
+                                "align": "center",
+                                "size": "xs",
+                                "color": "#FBFBFF"
+                            }
+                        ],
+                        "position": "absolute",
+                        "cornerRadius": "20px",
+                        "offsetTop": "18px",
+                        "backgroundColor": "#01B468",
+                        "offsetStart": "18px",
+
+                        # 用 padding 讓高度自然撐開，比 height 好控制
+                        "paddingAll": "4px",
+
+                        # 可以留著 width，讓膠囊寬度固定
+                        "width": "96px",
+
+                        # 垂直置中（雖然只有一個 text，但加了比較保險）
+                        "justifyContent": "center",
+                        "alignItems": "center"
                     }
-                ]
+                ],
+                "paddingAll": "0px"
             },
-            # Footer（可互動的 Button Group）=> 作品集主功能
+            # 點線
             "footer": {
                 "type": "box",
                 "layout": "vertical",
-                "spacing": "sm",
                 "contents": [
-                    # 按鈕 1：查看作品集=> 點了之後 → Bot 回傳“作品集”，觸發你的作品集 Flex menu
+
                     {
-                        "type": "button",
-                        "style": "link",
-                        "height": "sm",
-                        "action": {
-                            "type": "message",
-                            "label": "查看作品集",
-                            "text": "作品集"
-                        }
+                    "type": "text",
+                    "text": "工作經歷 Timeline",
+                    "color": "#b7b7b7",
+                    "size": "xs"
                     },
-                    { # 按鈕 2：心理諮商地圖 Demo
-                        "type": "button",
-                        "style": "link",
-                        "height": "sm",
-                        "action": {
-                            "type": "message",
-                            "label": "心理諮商地圖 Demo",
-                            "text": "心理諮商地圖"
+
+                    {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "contents": [
+                        {
+                        "type": "text",
+                        "text": "2024.11–2025.05",
+                        "size": "xs",
+                        "gravity": "center",
+                        "color": "#666666",
+                        "flex": 2,
+                        "wrap": True,
+                        
+                        },
+                        {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            { "type": "filler" },
+                            {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [],
+                            "cornerRadius": "30px",
+                            "height": "12px",
+                            "width": "12px",
+                            "borderColor": "#EF454D",
+                            "borderWidth": "2px"
+                            },
+                            { "type": "filler" }
+                        ],
+                        "flex": 0
+                        },
+                        {
+                        "type": "text",
+                        "text": "擎天有限公司｜後端工程師",
+                        "gravity": "center",
+                        "flex": 5,
+                        "size": "sm",
+                        "wrap": True,
+                        "color": "#b7b7b7"
                         }
+                    ],
+                    "spacing": "lg",
+                    "cornerRadius": "30px",
+                    "margin": "xl"
                     },
-                    {# 按鈕 3：地政查詢 Demo
-                        "type": "button",
-                        "style": "link",
-                        "height": "sm",
-                        "action": {
-                            "type": "message",
-                            "label": "地政查詢 Demo",
-                            "text": "地政查詢"
+
+                    {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "contents": [
+                        {
+                        "type": "box",
+                        "layout": "baseline",
+                        "contents": [ { "type": "filler" } ],
+                        "flex": 2
+                        },
+                        {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            {
+                            "type": "box",
+                            "layout": "horizontal",
+                            "contents": [
+                                { "type": "filler" },
+                                {
+                                "type": "box",
+                                "layout": "vertical",
+                                "contents": [],
+                                "width": "2px",
+                                "backgroundColor": "#B7B7B7"
+                                },
+                                { "type": "filler" }
+                            ],
+                            "flex": 1
+                            }
+                        ],
+                        "width": "12px"
+                        },
+                        {
+                        "type": "text",
+                        "text": "IoT 金流系統 / MQTT / OTA / API 整合",
+                        "gravity": "center",
+                        "flex": 5,
+                        "size": "xs",
+                        "color": "#8c8c8c",
+                        "wrap": True
                         }
+                    ],
+                    "spacing": "lg",
+                    "height": "64px"
+                    },
+
+                    {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "contents": [
+                        {
+                        "type": "text",
+                        "text": "2025.06–至今",
+                        "gravity": "center",
+                        "size": "xs",
+                        "color": "#666666",
+                        "flex": 2,
+                        "wrap": True
+                        },
+                        {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            { "type": "filler" },
+                            {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [],
+                            "cornerRadius": "30px",
+                            "width": "12px",
+                            "height": "12px",
+                            "borderWidth": "2px",
+                            "borderColor": "#6486E3"
+                            },
+                            { "type": "filler" }
+                        ],
+                        "flex": 0
+                        },
+                        {
+                        "type": "text",
+                        "text": "接案｜後端×AI Agent 技能進修",
+                        "gravity": "center",
+                        "flex": 5,
+                        "size": "sm",
+                        "wrap": True,
+                        "color": "#b7b7b7"
+                        }
+                    ],
+                    "spacing": "lg",
+                    "cornerRadius": "30px"
+                    },
+
+                    {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "contents": [
+                        {
+                        "type": "box",
+                        "layout": "baseline",
+                        "contents": [ { "type": "filler" } ],
+                        "flex": 2
+                        },
+                        {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            {
+                            "type": "box",
+                            "layout": "horizontal",
+                            "contents": [
+                                { "type": "filler" },
+                                {
+                                "type": "box",
+                                "layout": "vertical",
+                                "contents": [],
+                                "width": "2px",
+                                "backgroundColor": "#6486E3"
+                                },
+                                { "type": "filler" }
+                            ],
+                            "flex": 1
+                            }
+                        ],
+                        "width": "12px"
+                        },
+                        {
+                        "type": "text",
+                        "text": "FastAPI / AI Agent / Playwright / LINE Bot",
+                        "gravity": "center",
+                        "flex": 5,
+                        "size": "xs",
+                        "color": "#8c8c8c",
+                        "wrap": True
+                        }
+                    ],
+                    "spacing": "lg",
+                    "height": "64px"
                     }
                 ],
-                "flex": 0
-            }
+                "paddingAll": "12px",
+                "spacing": "md"
+                }
+
         }
     }
     return flex
