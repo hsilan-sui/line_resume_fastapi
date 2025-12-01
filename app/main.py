@@ -11,7 +11,7 @@ from app.utils.fuzzy import fuzzy_match
 from app.utils.classify import classify_input
 from app.line.client import reply_message
 
-
+from app.line.flex_builder.clinic_item import build_clinic_flex_item # 診所單張卡片
 
 load_dotenv()
 
@@ -28,192 +28,10 @@ app = FastAPI()
 import re
 from urllib.parse import quote
 
-def build_clinic_flex_item(c):
-    # 狀態
-    status_text = "有名額" if c["has_quota"] else "無名額"
-    status_color = "#4CAF50" if c["has_quota"] else "#F44336"
 
-    tele = "支援遠距" if c.get("teleconsultation") else "無遠距"
-
-    # Google Maps
-    address_query = quote(c["address"])
-    map_url = f"https://www.google.com/maps/search/?api=1&query={address_query}"
-
-    # ============
-    # 電話安全清洗
-    # ============
-    phone_raw = (c.get("phone") or "").split("、")[0].strip()
-    phone_clean = re.sub(r"[^0-9+]", "", phone_raw)
-    phone_uri = f"tel:{phone_clean}" if phone_clean else "tel:000"
-
-    # ============
-    # 官網 URL fallback（處理 None、空字串、不合法網址）
-    # ============
-    url = c.get("org_url") or ""
-    url = str(url).strip()              # 強制變字串
-    if not (url.startswith("http://") or url.startswith("https://")):
-        # 用 Google 搜尋診所名稱當 fallback
-        url = "https://google.com/search?q=" + quote(c["org_name"])
-
-    return {
-        "type": "bubble",
-        "size": "mega",
-        "body": {
-            "type": "box",
-            "layout": "vertical",
-            "contents": [
-
-                # 標題列
-                {
-                    "type": "box",
-                    "layout": "vertical",
-                    "backgroundColor": "#22c55e",
-                    "paddingAll": "12px",
-                    "cornerRadius": "md",
-                    "contents": [
-                        {
-                            "type": "text",
-                            "text": c["org_name"],
-                            "weight": "bold",
-                            "size": "lg",
-                            "color": "#ffffff"
-                        }
-                    ]
-                },
-
-                # 地址 & 電話
-                {
-                    "type": "box",
-                    "layout": "vertical",
-                    "margin": "md",
-                    "spacing": "sm",
-                    "contents": [
-                        {
-                            "type": "text",
-                            "text": f"📍 {c['address']}",
-                            "wrap": True,
-                            "size": "sm"
-                        },
-                        {
-                            "type": "text",
-                            "text": f"📞 {c['phone']}",
-                            "size": "sm",
-                            "color": "#1d4ed8",
-                            "action": {
-                                "type": "uri",
-                                "uri": phone_uri
-                            }
-                        }
-                    ]
-                },
-
-                # 狀態列
-                {
-                    "type": "box",
-                    "layout": "horizontal",
-                    "margin": "md",
-                    "spacing": "sm",
-                    "contents": [
-                        {
-                            "type": "text",
-                            "text": f"🩺 {status_text}",
-                            "color": status_color,
-                            "weight": "bold",
-                            "size": "sm"
-                        },
-                        {
-                            "type": "text",
-                            "text": f"｜ {tele}",
-                            "size": "sm",
-                            "color": "#6b7280"
-                        }
-                    ]
-                },
-
-                # 名額 badge
-                {
-                    "type": "box",
-                    "layout": "horizontal",
-                    "margin": "md",
-                    "contents": [
-                        {
-                            "type": "box",
-                            "layout": "vertical",
-                            "backgroundColor": "#3b82f6",
-                            "cornerRadius": "50px",
-                            "paddingAll": "6px",
-                            "contents": [
-                                {
-                                    "type": "text",
-                                    "text": f"本週 {c['this_week']}",
-                                    "size": "sm",
-                                    "color": "#ffffff",
-                                    "align": "center"
-                                }
-                            ]
-                        },
-                        {
-                            "type": "box",
-                            "layout": "vertical",
-                            "margin": "md",
-                            "backgroundColor": "#f59e0b",
-                            "cornerRadius": "50px",
-                            "paddingAll": "6px",
-                            "contents": [
-                                {
-                                    "type": "text",
-                                    "text": f"下週 {c['next_week']}",
-                                    "size": "sm",
-                                    "color": "#ffffff",
-                                    "align": "center"
-                                }
-                            ]
-                        }
-                    ]
-                },
-
-                # 更新日期
-                {
-                    "type": "text",
-                    "text": f"更新：{c['edit_date']}",
-                    "size": "xs",
-                    "margin": "md",
-                    "color": "#9ca3af"
-                }
-            ]
-        },
-
-        # footer: 官網 + 地圖
-        "footer": {
-            "type": "box",
-            "layout": "horizontal",
-            "contents": [
-                {
-                    "type": "button",
-                    "style": "primary",
-                    "color": "#d946ef",
-                    "action": {
-                        "type": "uri",
-                        "label": "官網",
-                        "uri": url
-                    },
-                    "height": "sm"
-                },
-                {
-                    "type": "button",
-                    "style": "secondary",
-                    "action": {
-                        "type": "uri",
-                        "label": "地圖",
-                        "uri": map_url
-                    },
-                    "height": "sm"
-                }
-            ]
-        }
-    }
-
-
+# ============
+# Flex Card (多診所 carousel)
+# ============
 def build_clinic_flex(results):
     bubbles = [build_clinic_flex_item(c) for c in results[:12]]
     return {
@@ -249,11 +67,15 @@ def build_clinic_flex(results):
     }
 
 
-
+# ============
+# 只留有名額診所
+# ============
 def filter_available(clinic_list):
     return [c for c in clinic_list if c.get("has_quota") is True]
 
-
+# ============
+# Flex Card (履歷 bubble)
+# ============
 def build_resume_flex():
     flex = {
         "type": "flex",
@@ -340,7 +162,9 @@ def build_resume_flex():
     }
     return flex
 
-
+# ============
+# Flex Card (作品集 carousel)
+# ============
 def build_portfolio_carousel():
     return {
         "type": "flex",
@@ -455,7 +279,9 @@ def build_portfolio_carousel():
     }
 
 
-
+# ============
+# Flex Card (心理諮商診所查詢入口 bubble)
+# ============
 def build_counseling_entry():
     return {
         "type": "flex",
@@ -547,7 +373,9 @@ def build_counseling_entry():
     }
 
 
-
+# ============
+# 
+# ============
 @app.get("/")
 async def root():
     return {"message": "FastAPI LINE Bot is running"}
