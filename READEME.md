@@ -2,6 +2,10 @@
 - 這份文件比較像是自己做line oa的流程和進度筆記整理
 - 下載poetry(練習使用)
 - 使用fastapi
+
+## 專案分層架構
+
+
 ## 流程
 
 ### 🚀 Day 1｜LINE OA × FastAPI Webhook 建置筆記
