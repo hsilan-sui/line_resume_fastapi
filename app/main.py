@@ -2,13 +2,17 @@ from fastapi import FastAPI, Request
 from dotenv import load_dotenv
 import json
 import requests
-import math
+#import math
 import os
 import re
-from difflib import SequenceMatcher
+# from difflib import SequenceMatcher
 from urllib.parse import quote
 
 from app.data.clinic_loader import clinics
+from app.utils.geo import geocode, haversine
+from app.utils.fuzzy import fuzzy_match
+from app.utils.classify import classify_input
+
 
 load_dotenv()
 
@@ -32,52 +36,52 @@ app = FastAPI()
 # 基本工具函式
 # ============
 
-def haversine(lat1, lon1, lat2, lon2):
-    R = 6371  # km
-    d_lat = math.radians(lat2 - lat1)
-    d_lon = math.radians(lon2 - lon1)
-    a = (
-        math.sin(d_lat/2)**2
-        + math.cos(math.radians(lat1))
-        * math.cos(math.radians(lat2))
-        * math.sin(d_lon/2)**2
-    )
-    return 2 * R * math.asin(math.sqrt(a))
+# def haversine(lat1, lon1, lat2, lon2):
+#     R = 6371  # km
+#     d_lat = math.radians(lat2 - lat1)
+#     d_lon = math.radians(lon2 - lon1)
+#     a = (
+#         math.sin(d_lat/2)**2
+#         + math.cos(math.radians(lat1))
+#         * math.cos(math.radians(lat2))
+#         * math.sin(d_lon/2)**2
+#     )
+#     return 2 * R * math.asin(math.sqrt(a))
 
 
-def geocode(query: str):
-    url = "https://nominatim.openstreetmap.org/search"
-    params = {"q": query, "format": "json", "limit": 1}
+# def geocode(query: str):
+#     url = "https://nominatim.openstreetmap.org/search"
+#     params = {"q": query, "format": "json", "limit": 1}
 
-    r = requests.get(url, params=params)
-    data = r.json()
+#     r = requests.get(url, params=params)
+#     data = r.json()
 
-    if not data:
-        return None
+#     if not data:
+#         return None
 
-    return float(data[0]["lat"]), float(data[0]["lon"])
+#     return float(data[0]["lat"]), float(data[0]["lon"])
 
-def fuzzy_match(keyword: str):
-    results = []
-    for c in clinics:
-        score = SequenceMatcher(None, c["org_name"], keyword).ratio()
-        if score > 0.55:  # 你可以調整
-            results.append((score, c))
+# def fuzzy_match(keyword: str):
+#     results = []
+#     for c in clinics:
+#         score = SequenceMatcher(None, c["org_name"], keyword).ratio()
+#         if score > 0.55:  # 你可以調整
+#             results.append((score, c))
 
-    # 分數高 → 排第一
-    results.sort(reverse=True, key=lambda x: x[0])
-    return [c for _, c in results][:5]
+#     # 分數高 → 排第一
+#     results.sort(reverse=True, key=lambda x: x[0])
+#     return [c for _, c in results][:5]
 
-def classify_input(text: str):
-    if any(k in text for k in ["區", "鄉", "鎮", "市"]):
-        return "district"
-    if any(k in text for k in ["路", "街", "大道", "巷", "號"]):
-        return "address"
-    # 嘗試診所字串比對
-    top = fuzzy_match(text)
-    if top:
-        return "clinic_keyword"
-    return "place"
+# def classify_input(text: str):
+#     if any(k in text for k in ["區", "鄉", "鎮", "市"]):
+#         return "district"
+#     if any(k in text for k in ["路", "街", "大道", "巷", "號"]):
+#         return "address"
+#     # 嘗試診所字串比對
+#     top = fuzzy_match(text)
+#     if top:
+#         return "clinic_keyword"
+#     return "place"
 
 # ============
 # Flex Card ((Upgraded — top 12 clinics))
