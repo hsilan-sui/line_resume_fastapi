@@ -14,6 +14,8 @@ from app.line.flex_builder.resume import build_resume_flex # (履歷 bubble)
 from app.line.flex_builder.portfolio import build_portfolio_carousel # 作品集 Carousel
 from app.line.flex_builder.counseling import build_counseling_entry # 查詢最近的心理諮商診所
 
+from app.line.flex_builder.landinfo_demo import build_landinfo_demo_flex
+
 
 router = APIRouter()
 
@@ -75,6 +77,14 @@ async def webhook(request: Request):
 
         if "心理諮商" in msg or "諮商" in msg:
             reply_message(reply_token, build_counseling_entry())
+            return {"ok": True}
+        
+        # 4️⃣ 地政 Demo ----
+        if "地政" in msg: 
+            # 你的 FastAPI 網域（要記得改成自己的）
+            BASE_URL = "https://f00f5389755a.ngrok-free.app"
+            flex = build_landinfo_demo_flex(BASE_URL)
+            reply_message(reply_token, flex)
             return {"ok": True}
 
         qtype = classify_input(msg)
