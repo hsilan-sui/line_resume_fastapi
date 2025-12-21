@@ -1,0 +1,127 @@
+# app/handlers/landinfo_chat.py
+import os
+import re
+import requests
+import redis.asyncio as redis
+
+from app.line.client import reply_message
+
+NODE_LANDINFO_URL = os.getenv("NODE_LANDINFO_URL", "http://127.0.0.1:3001").rstrip("/")
+REDIS_URL = os.getenv("REDIS_URL", "")
+MODE_TTL = int(os.getenv("LANDINFO_MODE_TTL_SEC", "600"))  # 預設 10 分鐘
+
+# ✅ Redis client（TLS：rediss://...）
+rds = redis.from_url(REDIS_URL, decode_responses=True) if REDIS_URL else None
+
+def _mode_key(user_id: str) -> str:
+    return f"mode:landinfo:{user_id}"
+
+def _parse_section_landno(text: str):
+    """
+    Do what: 解析「大利段 1306」或「大利段1306-0000」
+    How: regex 分段名 + 地號主號 + optional 子號
+    Why: 先做最穩定的純文字 MVP
+    """
+    msg = text.strip().replace("\u200b", "").replace("\n", "")
+    m = re.match(r"^(.+?段)\s*([0-9]{1,4})(?:\s*[-－–—~～]\s*([0-9]{1,4}))?$", msg)
+    if not m:
+        return None
+    section = m.group(1).strip()
+    no1 = m.group(2)
+    no2 = (m.group(3) or "").strip()
+    land_no = f"{no1}-{no2}" if no2 else no1
+    return section, land_no
+
+async def _enter_mode(user_id: str):
+    if not rds:
+        return
+    await rds.set(_mode_key(user_id), "1", ex=MODE_TTL)  # ✅ TTL
+
+async def _exit_mode(user_id: str):
+    if not rds:
+        return
+    await rds.delete(_mode_key(user_id))
+
+async def _in_mode(user_id: str) -> bool:
+    if not rds:
+        return False
+    v = await rds.get(_mode_key(user_id))
+    return v == "1"
+
+async def handle_landinfo_chat(event: dict, reply_token: str, msg: str) -> bool:
+    """
+    True  = 已處理（webhook 直接 return）
+    False = 不關地政，讓 webhook 繼續跑原本流程
+    """
+    user_id = (event.get("source") or {}).get("userId")
+    if not user_id:
+        return False
+
+    # 0) 支援取消
+    if msg in ("取消", "退出", "離開"):
+        if await _in_mode(user_id):
+            await _exit_mode(user_id)
+            reply_message(reply_token, [{"type": "text", "text": "已離開地政模式 ✅"}])
+            return True
+        return False
+
+    # 1) 入口：打「地政」
+    if msg == "地政":
+        await _enter_mode(user_id)
+        reply_message(reply_token, [{
+            "type": "text",
+            "text": "✅ 地政圖資查詢（目前固定：桃園市／復興區）\n請輸入：大利段 1306（或 1306-0000）\n離開請輸入：取消"
+        }])
+        return True
+
+    # 2) 不是地政模式 → 放行
+    if not await _in_mode(user_id):
+        return False
+
+    # 3) 地政模式中：解析段名地號
+    parsed = _parse_section_landno(msg)
+    if not parsed:
+        # 續命 TTL（使用者還在打字）
+        await _enter_mode(user_id)
+        reply_message(reply_token, [{
+            "type": "text",
+            "text": "格式不對喔，請輸入：大利段 1306（或 大利段 1306-0000）\n離開請輸入：取消"
+        }])
+        return True
+
+    section, land_no = parsed
+
+    # 4) enqueue 到 Node /jobs（worker 會 push 結果）
+    try:
+        resp = requests.post(
+            f"{NODE_LANDINFO_URL}/jobs",
+            json={
+                "city": "H",        # 桃園市（你目前 node 用 H / 13）
+                "district": "13",   # 復興區 townCode
+                "section": section,
+                "landNo": land_no,
+                "userId": user_id,
+            },
+            timeout=10
+        )
+        if resp.status_code != 200:
+            reply_message(reply_token, [{
+                "type": "text",
+                "text": f"⚠️ 入列失敗：{resp.status_code}\n{resp.text[:300]}"
+            }])
+            return True
+    except Exception as e:
+        reply_message(reply_token, [{
+            "type": "text",
+            "text": f"⚠️ 連不到 Node 派工服務（/jobs）：{e}"
+        }])
+        return True
+
+    # 5) 入列成功：可選擇要不要退出模式
+    await _exit_mode(user_id)
+
+    reply_message(reply_token, [{
+        "type": "text",
+        "text": f"🔍 已收到查詢：【桃園市 復興區 {section} {land_no}】\n完成後會推播結果 ✅"
+    }])
+    return True

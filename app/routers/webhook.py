@@ -16,6 +16,8 @@ from app.line.flex_builder.counseling import build_counseling_entry # 查詢最�
 
 from app.line.flex_builder.landinfo_demo import build_landinfo_demo_flex
 
+from app.handlers.landinfo_chat import handle_landinfo_chat
+
 
 router = APIRouter()
 
@@ -67,6 +69,9 @@ async def webhook(request: Request):
 
         print(f"👉 使用者訊息：{msg}")
 
+        if await handle_landinfo_chat(event, reply_token, msg):
+            return {"ok": True}
+
         if "作品集" in msg:
             reply_message(reply_token, build_portfolio_carousel())
             return {"ok": True}
@@ -80,12 +85,12 @@ async def webhook(request: Request):
             return {"ok": True}
         
         # 4️⃣ 地政 Demo ----
-        if "地政" in msg: 
-            # 你的 FastAPI 網域（要記得改成自己的）
-            BASE_URL = "https://f00f5389755a.ngrok-free.app"
-            flex = build_landinfo_demo_flex(BASE_URL)
-            reply_message(reply_token, flex)
-            return {"ok": True}
+        # if "地政" in msg: 
+        #     # 你的 FastAPI 網域（要記得改成自己的）
+        #     BASE_URL = "https://f00f5389755a.ngrok-free.app"
+        #     flex = build_landinfo_demo_flex(BASE_URL)
+        #     reply_message(reply_token, flex)
+        #     return {"ok": True}
 
         qtype = classify_input(msg)
         print(f"👉 判斷輸入類型：{qtype}")

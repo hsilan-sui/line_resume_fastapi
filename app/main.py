@@ -1,11 +1,18 @@
 from fastapi import FastAPI
 from dotenv import load_dotenv
+from pathlib import Path
+import os
+
+
 
 # 引入webhook 
 from app.routers.webhook import router as webhook_router
 from app.routers.landinfo import router as landinfo_router
 
-load_dotenv()
+# load_dotenv()
+BASE_DIR = Path(__file__).resolve().parent.parent  # app/ 的上一層 = 專案根
+load_dotenv(BASE_DIR / ".env")
+print("NODE_LANDINFO_URL =", os.getenv("NODE_LANDINFO_URL"))
 
 app = FastAPI()
 
