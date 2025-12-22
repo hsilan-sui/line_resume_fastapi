@@ -6,10 +6,21 @@ import redis.asyncio as redis
 
 from app.line.client import reply_message
 
+def build_landinfo_quickreply():
+    return {
+        "items": [
+            {"type": "action", "action": {"type": "message", "label": "直接跑範例", "text": "大利段 1306"}},
+            {"type": "action", "action": {"type": "message", "label": "回作品集", "text": "作品集"}},
+            {"type": "action", "action": {"type": "message", "label": "回主選單", "text": "menu"}},
+        ]
+    }
+
 NODE_LANDINFO_URL = os.getenv("NODE_LANDINFO_URL", "http://127.0.0.1:3001").rstrip("/")
 NODE_JOB_TOKEN = os.getenv("NODE_JOB_TOKEN")
 REDIS_URL = os.getenv("REDIS_URL", "")
 MODE_TTL = int(os.getenv("LANDINFO_MODE_TTL_SEC", "600"))  # 預設 10 分鐘
+
+
 
 # ✅ Redis client（TLS：rediss://...）
 rds = redis.from_url(REDIS_URL, decode_responses=True) if REDIS_URL else None
@@ -64,9 +75,13 @@ async def handle_landinfo_chat(event: dict, reply_token: str, msg: str) -> bool:
     True  = 已處理（webhook 直接 return）
     False = 不關地政，讓 webhook 繼續跑原本流程
     """
+    
     user_id = (event.get("source") or {}).get("userId")
     if not user_id:
         return False
+    
+    print(f"[地政聊天] 收到訊息：{msg}")
+    print(f"[地政聊天] 使用者 ID：{user_id}")
 
     # 0) 支援取消
     if msg in ("取消", "退出", "離開"):
@@ -86,13 +101,18 @@ async def handle_landinfo_chat(event: dict, reply_token: str, msg: str) -> bool:
         return True
 
     # 2) 不是地政模式 → 放行
-    if not await _in_mode(user_id):
-        return False
-
-    # 3) 地政模式中：解析段名地號
+    # if not await _in_mode(user_id):
+    #     return False
+    # 2) 判斷是否為合法地號格式（大利段1306）
     parsed = _parse_section_landno(msg)
-    if not parsed:
-        # 續命 TTL（使用者還在打字）
+    if parsed:
+        await _enter_mode(user_id)  # 可選，順便讓它進 mode（未來可保留前後文）
+    else:
+        # 如果不是地號格式，也沒進入 mode → 放行
+        if not await _in_mode(user_id):
+            return False
+
+        # 格式不對，但在 mode 裡 → 提示正確格式
         await _enter_mode(user_id)
         reply_message(reply_token, [{
             "type": "text",
@@ -100,9 +120,10 @@ async def handle_landinfo_chat(event: dict, reply_token: str, msg: str) -> bool:
         }])
         return True
 
+    # 3) 成功解析：開始派工
     section, land_no = parsed
 
-    # 4) enqueue 到 Node /jobs（worker 會 push 結果）
+    # enqueue 到 Node /jobs（worker 會 push 結果）
     try:
         if not NODE_JOB_TOKEN:
             reply_message(reply_token, [{
@@ -134,11 +155,12 @@ async def handle_landinfo_chat(event: dict, reply_token: str, msg: str) -> bool:
         }])
         return True
 
-    # 5) 入列成功：可選擇要不要退出模式
+    # 4) 提示成功，離開地政模式
     await _exit_mode(user_id)
     
     reply_message(reply_token, [{
         "type": "text",
-        "text": f"🔍 已收到查詢：【桃園市 復興區 {section} {land_no}】\n約 30~60 秒會推播結果 ✅"
+        "text": f"🔍 已收到查詢：【桃園市 復興區 {section} {land_no}】\n約 30~60 秒會推播結果 ✅",
+        "quickReply": build_landinfo_quickreply()
     }])
     return True
