@@ -7,11 +7,22 @@ import redis.asyncio as redis
 from app.line.client import reply_message
 
 NODE_LANDINFO_URL = os.getenv("NODE_LANDINFO_URL", "http://127.0.0.1:3001").rstrip("/")
+NODE_JOB_TOKEN = os.getenv("NODE_JOB_TOKEN")
 REDIS_URL = os.getenv("REDIS_URL", "")
 MODE_TTL = int(os.getenv("LANDINFO_MODE_TTL_SEC", "600"))  # 預設 10 分鐘
 
 # ✅ Redis client（TLS：rediss://...）
 rds = redis.from_url(REDIS_URL, decode_responses=True) if REDIS_URL else None
+
+def enqueue_land_job(payload: dict):
+    url = f"{NODE_LANDINFO_URL}/jobs"
+    resp = requests.post(
+        url,
+        json=payload,
+        headers={"x-job-token": NODE_JOB_TOKEN},
+        timeout=15,
+    )
+    return resp
 
 def _mode_key(user_id: str) -> str:
     return f"mode:landinfo:{user_id}"
@@ -93,17 +104,23 @@ async def handle_landinfo_chat(event: dict, reply_token: str, msg: str) -> bool:
 
     # 4) enqueue 到 Node /jobs（worker 會 push 結果）
     try:
-        resp = requests.post(
-            f"{NODE_LANDINFO_URL}/jobs",
-            json={
-                "city": "H",        # 桃園市（你目前 node 用 H / 13）
-                "district": "13",   # 復興區 townCode
-                "section": section,
-                "landNo": land_no,
-                "userId": user_id,
-            },
-            timeout=10
-        )
+        if not NODE_JOB_TOKEN:
+            reply_message(reply_token, [{
+                "type": "text",
+                "text": "⚠️ 系統未設定 NODE_JOB_TOKEN，請檢查 FastAPI .env 並重啟服務"
+            }])
+            return True
+
+        payload = {
+            "city": "H",        # 桃園市
+            "district": "13",   # 復興區 townCode
+            "section": section,
+            "landNo": land_no,
+            "userId": user_id,
+        }
+
+        resp = enqueue_land_job(payload)  # ✅ 會帶 x-job-token
+
         if resp.status_code != 200:
             reply_message(reply_token, [{
                 "type": "text",
@@ -119,9 +136,9 @@ async def handle_landinfo_chat(event: dict, reply_token: str, msg: str) -> bool:
 
     # 5) 入列成功：可選擇要不要退出模式
     await _exit_mode(user_id)
-
+    
     reply_message(reply_token, [{
         "type": "text",
-        "text": f"🔍 已收到查詢：【桃園市 復興區 {section} {land_no}】\n完成後會推播結果 ✅"
+        "text": f"🔍 已收到查詢：【桃園市 復興區 {section} {land_no}】\n約 30~60 秒會推播結果 ✅"
     }])
     return True
