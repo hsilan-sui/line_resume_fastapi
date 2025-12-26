@@ -29,7 +29,7 @@ def build_resume_flex():
                     # ======================
                     {
                         "type": "image",
-                        "url": "https://images.unsplash.com/photo-1503264116251-35a269479413?q=80&w=1536",
+                        "url": "https://pub-1e15d55216a149c193d07024bf1d5269.r2.dev/screenshots/fangchengyu.jpg",
                         "size": "full",
                         "aspectMode": "cover",
                         "aspectRatio": "2:3",
@@ -117,40 +117,40 @@ def build_resume_flex():
                                 ]
                             },
                             # --- CTA（查看作品集） ---
-                            {
-                                "type": "box",
-                                "layout": "vertical",
-                                "contents": [
-                                    {"type": "filler"},
-                                    {
-                                        "type": "box",
-                                        "layout": "baseline",
-                                        "contents": [
-                                            {"type": "filler"},
-                                            {
-                                                "type": "text",
-                                                "text": "查看作品集",
-                                                "color": "#ffffff",
-                                                "flex": 0,
-                                                "size": "sm"
-                                            },
-                                            {"type": "filler"}
-                                        ],
-                                        "spacing": "sm"
-                                    },
-                                    {"type": "filler"}
-                                ],
-                                "borderWidth": "1px",
-                                "cornerRadius": "4px",
-                                "spacing": "sm",
-                                "borderColor": "#ffffff",
-                                "margin": "xxl",
-                                "height": "40px",
-                                "action": {
-                                    "type": "message",
-                                    "text": "作品集"
-                                }
-                            }
+                            # {
+                            #     "type": "box",
+                            #     "layout": "vertical",
+                            #     "contents": [
+                            #         {"type": "filler"},
+                            #         {
+                            #             "type": "box",
+                            #             "layout": "baseline",
+                            #             "contents": [
+                            #                 {"type": "filler"},
+                            #                 {
+                            #                     "type": "text",
+                            #                     "text": "查看作品集",
+                            #                     "color": "#ffffff",
+                            #                     "flex": 0,
+                            #                     "size": "sm"
+                            #                 },
+                            #                 {"type": "filler"}
+                            #             ],
+                            #             "spacing": "sm"
+                            #         },
+                            #         {"type": "filler"}
+                            #     ],
+                            #     "borderWidth": "1px",
+                            #     "cornerRadius": "4px",
+                            #     "spacing": "sm",
+                            #     "borderColor": "#ffffff",
+                            #     "margin": "xxl",
+                            #     "height": "40px",
+                            #     "action": {
+                            #         "type": "message",
+                            #         "text": "作品集"
+                            #     }
+                            # }
                         ],
                         "position": "absolute",
                         "offsetBottom": "0px",

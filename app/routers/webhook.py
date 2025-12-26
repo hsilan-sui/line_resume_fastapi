@@ -136,6 +136,7 @@ async def webhook(request: Request):
         COMMAND_ROUTES = {
             "作品集": lambda: build_portfolio_carousel(),
             "履歷": lambda: build_resume_flex(),
+            "LINE名片": lambda: build_resume_flex(),
             "menu": lambda: build_main_menu_flex(),
 
             # ✅ 心理諮商 Demo（入口卡）
