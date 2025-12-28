@@ -17,6 +17,9 @@ from app.line.flex_builder.portfolio import build_portfolio_carousel
 from app.line.flex_builder.counseling import build_counseling_demo_messages
 from app.handlers.landinfo_chat import handle_landinfo_chat
 
+from app.line.flex_builder.landinfo_entry_flexmsg import build_landinfo_entry_flex
+# 底部快速回覆鍵
+from app.line.quickbtn.landinfo_quickreply import build_landinfo_quickreply
 
 router = APIRouter()
 
@@ -37,22 +40,13 @@ def build_result_quickreply_text():
         "text": "想繼續操作？",
         "quickReply": {
             "items": [
-                {"type": "action", "action": {"type": "location", "label": "再查一次（重傳定位）"}},
-                {"type": "action", "action": {"type": "message", "label": "回入口", "text": "心理諮商"}},
-                {"type": "action", "action": {"type": "message", "label": "回作品集", "text": "作品集"}},
+                {"type": "action", "action": {"type": "location", "label": "再查一次(重傳定位)"}},
+                {"type": "action", "action": {"type": "message", "label": "🟡 回查找入口", "text": "心理諮商資源查找"}},
+                {"type": "action", "action": {"type": "message", "label": "🟢 回作品集", "text": "作品集"}},
             ]
         }
     }
 
-# ✅ 地政 quick reply（可加回主選單）
-def build_landinfo_quickreply():
-    return {
-        "items": [
-            {"type": "action", "action": {"type": "message", "label": "直接跑範例", "text": "大利段 1306"}},
-            {"type": "action", "action": {"type": "message", "label": "回作品集", "text": "作品集"}},
-            {"type": "action", "action": {"type": "message", "label": "回主選單", "text": "menu"}},
-        ]
-    }
 
 
 @router.post("/webhook")
@@ -140,24 +134,31 @@ async def webhook(request: Request):
             "menu": lambda: build_main_menu_flex(),
 
             # ✅ 心理諮商 Demo（入口卡）
-            "全台心理諮商診所": lambda: build_counseling_demo_messages(),
-            "心理諮商": lambda: build_counseling_demo_messages(),
-            "諮商": lambda: build_counseling_demo_messages(),
-            "心理諮商地圖": lambda: build_counseling_demo_messages(),
+            # "全台心理諮商診所": lambda: build_counseling_demo_messages(),
+            # "心理諮商": lambda: build_counseling_demo_messages(),
+            # "諮商": lambda: build_counseling_demo_messages(),
+            "心理諮商資源查找": lambda: build_counseling_demo_messages(),
 
             # 方案說明（回文字連結）
             "衛福部方案說明": lambda: {
                 "type": "text",
-                "text": f"衛福部｜15–45 歲心理健康支持方案（官方說明）：\n{MOHW_URL}"
+                "text": f"衛福部｜15–45歲心理健康支持方案（官方說明）：\n{MOHW_URL}"
             },
 
             # ✅ 這顆按鈕建議：直接引導「可貼上的 demo 指令」
             # （如果你已經有 build_landinfo_demo_flex 且不需 BASE_URL，就改成回 flex）
+            # "地政": lambda: {
+            #     "type": "text",
+            #     "text": "💬 請輸入：地段 地號（或點擊⤵️直接跑範例：新光段 549）",
+            #     "quickReply": build_landinfo_quickreply(),
+            # },
             "地政": lambda: {
-                "type": "text",
-                "text": "請輸入：段名 空格 地號（例：大利段 1306）",
+                "type": "flex",
+                "altText": "地政圖資查詢 Demo",
+                "contents": build_landinfo_entry_flex()["contents"],
                 "quickReply": build_landinfo_quickreply(),
             },
+
             "露營票務系統": lambda: {
                 "type": "text",
                 "text": "🎟 Everforest 活動票務系統（Backend）\n亮點：額滿控制 / 訂單流程 / 通知\nRepo：<貼連結>"

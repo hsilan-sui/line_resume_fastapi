@@ -88,7 +88,7 @@ def build_portfolio_carousel():
                         "paddingAll": "0px",
                         "contents": [
                             build_image_header(
-                                "https://i.imgur.com/IZkcxQq.jpeg",
+                                "https://pub-1e15d55216a149c193d07024bf1d5269.r2.dev/screenshots/landinfo_03.png",
                                 "後端 Node.js ",
                                 "#FF4D8D"
                             ),
@@ -98,28 +98,40 @@ def build_portfolio_carousel():
                                 "spacing": "sm",
                                 "paddingAll": "16px",
                                 "contents": [
-                                    {"type": "text", "text": "地政自動化查詢", "weight": "bold", "size": "lg"},
+                                    {"type": "text", "text": "地政圖資 LINE 自動查詢", "weight": "bold", "size": "lg"},
                                     {
-                                        "type": "text",
-                                        "text": "Playwright + Cloud Run\n自動查詢段名地號，擷取謄本與地籍圖",
-                                        "size": "sm",
-                                        "wrap": True,
-                                        "color": "#666666"
+                                        "type": "separator",
+                                        "margin": "md"
                                     },
+                                    {"type": "text", "text": "📝 LINE輸入 ➜ 地段地號", "size": "sm", "wrap": True, "color": "#6B7280"},
+                                    {"type": "text", "text": "🔍 系統先回 ➜ 已收到查詢", "size": "sm", "wrap": True, "color": "#6B7280"},
+                                    {"type": "text", "text": "✅ 完成後 ➜ 推播 地圖與重點資料", "size": "sm", "wrap": True, "color": "#111827"},
+                                
                                 ]
                             }
                         ]
                     },
                     "footer": {
-                        "type": "box",
-                        "layout": "vertical",
-                        "spacing": "sm",
-                        "contents": [
+                    "type": "box",
+                    "layout": "vertical",
+                    "spacing": "sm",
+                    "paddingAll": "12px",
+                    "contents": [   
                             {
-                                "type": "button",
-                                "action": {"type": "message", "label": "查看 Demo", "text": "地政"}
+                            "type": "button",
+                            "style": "primary",
+                            "color": "#14B8A6",
+                            "height": "sm",
+                            "action": {"type": "message", "label": "🚀 立即體驗", "text": "地政"}
                             }
-                        ]
+                            # ,
+                            # {
+                            # "type": "button",
+                            # "style": "secondary",
+                            # "height": "sm",
+                            # "action": {"type": "uri", "label": "💻 GitHub Repo", "uri": "https://github.com/hsilan-sui/landinfo_api"}
+                            # }
+                    ]
                     }
                 },
 
@@ -133,93 +145,93 @@ def build_portfolio_carousel():
                         "paddingAll": "0px",
                         "contents": [
                             build_image_header(
-                                "https://i.imgur.com/j8AfACY.jpeg",
+                                "https://pub-1e15d55216a149c193d07024bf1d5269.r2.dev/screenshots/com_sideproject.png",
                                 "前端 Next.js",
                                 "#01B468"
                             ),
                             {
-                                "type": "box",
-                                "layout": "vertical",
-                                "spacing": "sm",
-                                "paddingAll": "16px",
-                                "contents": [
-                                    {"type": "text", "text": "心理諮商地圖 Demo", "weight": "bold", "size": "lg"},
-                                    {
-                                        "type": "text",
-                                        "text": "Next.js + Leaflet + Redis Queue\n全台 614 間合作心理諮商診所地圖",
-                                        "size": "sm",
-                                        "wrap": True,
-                                        "color": "#666666"
-                                    },
-                                ]
-                            }
-                        ]
-                    },
-                    "footer": {
-                        "type": "box",
-                        "layout": "vertical",
-                        "spacing": "sm",
-                        "contents": [
-                            {
-                                "type": "button",
-                                "action": {"type": "message", "label": "查看 Demo", "text": "全台心理諮商診所"}
-                            }
-                        ]
-                    }
-                },
+                            "type": "box",
+                            "layout": "vertical",
+                            "spacing": "sm",
+                            "paddingAll": "16px",
+                            "contents": [
+                                {"type": "text", "text": "免費諮商資源LINE一鍵查", "weight": "bold", "size": "lg"},
+                                {"type": "separator", "margin": "md"},
+                                
+                                {"type": "text", "text": "📍 定位查詢 ➜ 回傳最近12家診所", "size": "sm", "wrap": True, "color": "#6B7280"},
+                                {"type": "text", "text": "✅ 免費配額 ➜ 衛福部專案免費三次", "size": "sm", "wrap": True, "color": "#6B7280"},
+                                {"type": "text", "text": "☎️ 診所卡片 ➜ 一鍵撥號 與 導航", "size": "sm", "wrap": True, "color": "#111827"},
+                                {"type": "text", "text": "或網頁版地圖查找(自架公益網站)", "size": "sm", "wrap": True, "color": "#6B7280"},
 
-                # 作品 3：Everforest 活動票務系統（Backend）
-                {
-                    "type": "bubble",
-                    "size": "kilo",
-                    "body": {
-                        "type": "box",
-                        "layout": "vertical",
-                        "paddingAll": "0px",
-                        "contents": [
-                            build_image_header(
-                                "https://i.imgur.com/L9uCggH.jpeg",
-                                "後端 Node.js",
-                                "#FF4D8D"
-                            ),
-                            {
-                                "type": "box",
-                                "layout": "vertical",
-                                "spacing": "sm",
-                                "paddingAll": "16px",
-                                "contents": [
-                                    {"type": "text", "text": "Everforest 活動票務系統（Backend）", "weight": "bold", "size": "lg"},
-                                    {
-                                        "type": "text",
-                                        "text": "Node.js + Express + PostgreSQL\n活動管理、購票下單、額滿控制、訂單通知",
-                                        "size": "sm",
-                                        "wrap": True,
-                                        "color": "#666666"
-                                    },
-                                    {
-                                        "type": "text",
-                                        "text": "Tech：TypeORM｜JWT (HttpOnly Cookie)｜Docker｜Swagger",
-                                        "size": "xs",
-                                        "wrap": True,
-                                        "color": "#999999"
-                                    }
-                                ]
-                            }
-                        ]
+                                {"type": "text", "text": "備註 位置可模糊傳送也能查", "size": "xs", "wrap": True, "color": "#9CA3AF"}
+  ]
+                        }
+                    ]
+                        },
+                        "footer": {
+                            "type": "box",
+                            "layout": "vertical",
+                            "spacing": "sm",
+                            "paddingAll": "12px",
+                            "contents": [
+                                {
+                                    "type": "button",
+                                    "style": "primary",
+                                    "color": "#14B8A6",
+                                    "height": "sm",
+                                    "action": {"type": "message", "label": "🚀 立即體驗", "text": "心理諮商資源查找"}
+                                }
+                            ]
+                        }
                     },
-                    "footer": {
-                        "type": "box",
-                        "layout": "vertical",
-                        "spacing": "sm",
-                        "contents": [
-                            {
-                                "type": "button",
-                                "action": {"type": "message", "label": "查看 Demo", "text": "露營票務系統"}
-                            }
-                        ]
-                    }
-                },
+                # 作品 3：Everforest 活動票務系統（改成作品1同款）
+                    {
+                        "type": "bubble",
+                        "size": "kilo",
+                        "body": {
+                            "type": "box",
+                            "layout": "vertical",
+                            "paddingAll": "0px",
+                            "contents": [
+                                build_image_header(
+                                    "https://i.imgur.com/L9uCggH.jpeg",
+                                    "後端 Node.js",
+                                    "#FF4D8D"
+                                ),
+                                {
+                                    "type": "box",
+                                    "layout": "vertical",
+                                    "spacing": "sm",
+                                    "paddingAll": "16px",
+                                    "contents": [
+                                        {"type": "text", "text": "Everforest 活動票務系統", "weight": "bold", "size": "lg"},
+                                        {"type": "separator", "margin": "md"},
+
+                                        {"type": "text", "text": "🧾 活動管理 ➜ 方案 加購 圖片 上架", "size": "sm", "wrap": True, "color": "#6B7280"},
+                                        {"type": "text", "text": "🛒 購票下單 ➜ 訂單流程 額滿控制", "size": "sm", "wrap": True, "color": "#6B7280"},
+                                        {"type": "text", "text": "✅ 通知與驗票 ➜ 信件 票券 核銷", "size": "sm", "wrap": True, "color": "#111827"},
+                                    ]
+                                }
+                            ]
+                        },
+                        "footer": {
+                            "type": "box",
+                            "layout": "vertical",
+                            "spacing": "sm",
+                            "paddingAll": "12px",
+                            "contents": [
+                                {
+                                    "type": "button",
+                                    "style": "primary",
+                                    "color": "#14B8A6",
+                                    "height": "sm",
+                                    "action": {"type": "message", "label": "🚀 立即體驗", "text": "露營票務系統"}
+                                }
+                            ]
+                        }
+                    },
                 # 作品 4：LINE OA 互動作品集（FastAPI）
+
                 {
                     "type": "bubble",
                     "size": "kilo",
@@ -229,7 +241,7 @@ def build_portfolio_carousel():
                         "paddingAll": "0px",
                         "contents": [
                             build_image_header(
-                                "https://i.imgur.com/xxxxxxx.jpeg",  # 先隨便放一張，之後換成你的截圖
+                                "https://i.imgur.com/xxxxxxx.jpeg",  # 換成你的截圖或 UI 圖
                                 "後端 FastAPI",
                                 "#FF4D8D"
                             ),
@@ -239,21 +251,12 @@ def build_portfolio_carousel():
                                 "spacing": "sm",
                                 "paddingAll": "16px",
                                 "contents": [
-                                    {"type": "text", "text": "LINE OA 互動作品集（FastAPI）", "weight": "bold", "size": "lg"},
-                                    {
-                                        "type": "text",
-                                        "text": "Follow 歡迎訊息＋主選單 Flex\n整合作品入口與 Demo 指令流程",
-                                        "size": "sm",
-                                        "wrap": True,
-                                        "color": "#666666"
-                                    },
-                                    {
-                                        "type": "text",
-                                        "text": "Tech：FastAPI｜LINE Messaging API｜Flex Message",
-                                        "size": "xs",
-                                        "wrap": True,
-                                        "color": "#999999"
-                                    }
+                                    {"type": "text", "text": "LINE OA 互動作品集 Demo", "weight": "bold", "size": "lg"},
+                                    {"type": "separator", "margin": "md"},
+
+                                    {"type": "text", "text": "👋 加入好友 ➜ 自動回歡迎與導覽", "size": "sm", "wrap": True, "color": "#6B7280"},
+                                    {"type": "text", "text": "🧩 主選單入口 ➜ 作品卡與指令流程", "size": "sm", "wrap": True, "color": "#6B7280"},
+                                    {"type": "text", "text": "🚀 串接 Demo ➜ 導到地政與地圖功能", "size": "sm", "wrap": True, "color": "#111827"},
                                 ]
                             }
                         ]
@@ -262,10 +265,14 @@ def build_portfolio_carousel():
                         "type": "box",
                         "layout": "vertical",
                         "spacing": "sm",
+                        "paddingAll": "12px",
                         "contents": [
                             {
                                 "type": "button",
-                                "action": {"type": "message", "label": "查看說明", "text": "LINE OA"}
+                                "style": "primary",
+                                "color": "#14B8A6",
+                                "height": "sm",
+                                "action": {"type": "message", "label": "🚀 立即體驗", "text": "LINE OA"}
                             }
                         ]
                     }

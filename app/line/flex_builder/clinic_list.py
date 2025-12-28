@@ -41,31 +41,31 @@ def build_clinic_flex(results):
             "contents": bubbles # 剛組的每張診所 bubble list
         },
     # ③ Quick Reply 設計 => 放了下方 UX 快捷按鈕
-        "quickReply": {
-            "items": [
-                ## Quick Reply 1：連到我做的全台心理諮商查詢網站＝>網站則是「完整資訊」
-                {
-                    "type": "action",
-                    "imageUrl": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_34_article.png",
-                    "action": {
-                        "type": "uri",
-                        "label": "查找政府合作全台心理諮商網站",
-                        "uri": "https://counseling-map.vercel.app/"
-                    }
-                },
-                ## Quick Reply 2：回到作品集 => 提供返回「作品集 Flex Menu」的入口(使用者不會迷路)
-                {
-                    "type": "action",
-                    "imageUrl": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_17_bookmark.png",
-                    "action": {
-                        "type": "message",
-                        "label": "回到作品集",
-                        "text": "作品集"
-                    }
-                }
-            ],
+        # "quickReply": {
+        #     "items": [
+        #         ## Quick Reply 1：連到我做的全台心理諮商查詢網站＝>網站則是「完整資訊」
+        #         {
+        #             "type": "action",
+        #             "imageUrl": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_34_article.png",
+        #             "action": {
+        #                 "type": "uri",
+        #                 "label": "查找政府合作全台心理諮商網站",
+        #                 "uri": "https://counseling-map.vercel.app/"
+        #             }
+        #         },
+        #         ## Quick Reply 2：回到作品集 => 提供返回「作品集 Flex Menu」的入口(使用者不會迷路)
+        #         {
+        #             "type": "action",
+        #             "imageUrl": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_17_bookmark.png",
+        #             "action": {
+        #                 "type": "message",
+        #                 "label": "回到作品集",
+        #                 "text": "作品集"
+        #             }
+        #         }
+        #     ],
             
-        }
+        # }
     }
 
 

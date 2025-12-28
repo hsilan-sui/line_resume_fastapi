@@ -9,7 +9,7 @@ def build_landinfo_demo_flex(base_url: str):
     base_url: 你的 FastAPI 網域，例如 https://xxx.ngrok-free.app
     """
 
-    name = quote("大利段")
+    name = quote("新光段")
 
     return {
         "type": "flex",

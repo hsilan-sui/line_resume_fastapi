@@ -104,7 +104,7 @@ def build_clinic_flex_item(c):
                         }
                     ]
                 },
-
+{"type": "separator", "margin": "sm", "color": "#0B6B55"},
                 ### 狀態列（有名額 / 遠距）
                 {
                     "type": "box",
@@ -127,7 +127,7 @@ def build_clinic_flex_item(c):
                         }
                     ]
                 },
-
+                # {"type": "separator", "margin": "sm", "color": "#0B6B55"},
                 ### 名額 badge(兩個badge)
                 {
                     "type": "box",
@@ -144,7 +144,7 @@ def build_clinic_flex_item(c):
                             "contents": [
                                 {
                                     "type": "text",
-                                    "text": f"本週 {c['this_week']}",
+                                    "text": f"本週 {c['this_week']}名額",
                                     "size": "sm",
                                     "color": "#ffffff",
                                     "align": "center"
@@ -162,7 +162,7 @@ def build_clinic_flex_item(c):
                             "contents": [
                                 {
                                     "type": "text",
-                                    "text": f"下週 {c['next_week']}",
+                                    "text": f"下週 {c['next_week']}名額",
                                     "size": "sm",
                                     "color": "#ffffff",
                                     "align": "center"
@@ -173,43 +173,49 @@ def build_clinic_flex_item(c):
                 },
 
                 ### 更新日期 => 讓使用者知道資料新不新
-                {
-                    "type": "text",
-                    "text": f"更新：{c['edit_date']}",
-                    "size": "xs",
-                    "margin": "md",
-                    "color": "#9ca3af"
-                }
+                # {
+                #     "type": "text",
+                #     "text": f"更新：{c['edit_date']}",
+                #     "size": "xs",
+                #     "margin": "md",
+                #     "color": "#9ca3af"
+                # }
             ]
         },
 
         ### footer: 官網 + 地圖 => 提供 CTA（Call-to-Action）
         # 每張卡至少要有兩個可操作動作
         "footer": {
+    "type": "box",
+    "layout": "vertical",
+    "paddingAll": "12px",
+    "spacing": "md",
+    "contents": [
+        # ✅ 分隔線 + 上下留白（靠 margin）
+        {"type": "separator", "margin": "sm", "color": "#0B6B55"},
+
+        # ✅ 按鈕列（不用 margin md，交給外層 spacing）
+        {
             "type": "box",
             "layout": "horizontal",
+            "spacing": "sm",
             "contents": [
                 {
                     "type": "button",
-                    "style": "primary",
-                    "color": "#d946ef",
-                    "action": {
-                        "type": "uri",
-                        "label": "官網",
-                        "uri": url
-                    },
-                    "height": "sm"
+                    "style": "secondary",
+                    "height": "sm",
+                    "action": {"type": "uri", "label": "官網", "uri": url}
                 },
                 {
                     "type": "button",
                     "style": "secondary",
-                    "action": {
-                        "type": "uri",
-                        "label": "地圖",
-                        "uri": map_url
-                    },
-                    "height": "sm"
+                    "height": "sm",
+                    "action": {"type": "uri", "label": "地圖導航", "uri": map_url}
                 }
             ]
         }
+    ]
+}
+
+
     }
