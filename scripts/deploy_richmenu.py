@@ -35,6 +35,7 @@ if not TOKEN:
 API_BASE = "https://api.line.me" # LINE 的「建立 richmenu / 設預設」
 API_DATA_BASE = "https://api-data.line.me" # LINE 的「上傳圖片 content」走 api-data.line.me
 
+
 # 3) 比例轉像素：LINE 要的是整數像素 bounds => 把 AREAS_PCT 的 0~1 比例轉成像素
 # LINE richmenu 的 bounds 格式只能吃像素整數
 # 比例 × 圖寬或圖高

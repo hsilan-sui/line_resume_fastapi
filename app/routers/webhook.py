@@ -20,6 +20,8 @@ from app.handlers.landinfo_chat import handle_landinfo_chat
 from app.line.flex_builder.landinfo_entry_flexmsg import build_landinfo_entry_flex
 # 底部快速回覆鍵
 from app.line.quickbtn.landinfo_quickreply import build_landinfo_quickreply
+from app.line.quickbtn.main_quickreply import build_portfolio_quickreply
+from app.line.richmenu import ensure_user_has_home_richmenu
 
 router = APIRouter()
 
@@ -28,6 +30,12 @@ MOHW_URL = "https://www.mohw.gov.tw/cp-16-79408-1.html"
 def ensure_list(payload):
     return payload if isinstance(payload, list) else [payload]
 
+def build_portfolio_qr_text():
+    return {
+        "type": "text",
+        "text": "快速選單 👇",
+        "quickReply": build_portfolio_quickreply()
+    }
 
 def build_result_quickreply_text():
     """
@@ -61,20 +69,27 @@ async def webhook(request: Request):
 
     # Follow 事件 → 回 2 則訊息（文字保底 + Flex 主選單）
     if event_type == "follow":
+        user_id = (event.get("source") or {}).get("userId")
+        # ✅ 先強制綁 rich menu（讓新加入的人立刻看到）
+        if user_id:
+            try:
+                await ensure_user_has_home_richmenu(user_id)
+            except Exception as e:
+                print("[richmenu] link failed:", repr(e))
         welcome_text = (
-            "嗨，我是 Sui，這支 LINE 是「可體驗的互動作品集」。\n\n"
-            "輸入：\n"
-            "作品集 － 看所有 Demo\n"
-            "履歷 － 履歷卡\n"
-            "地政 － 立即體驗查詢（大利段 1306）\n"
-            "心理諮商 － 開地圖 Demo\n"
-            "GitHub － 專案連結\n"
-            "Email － 聯絡我（含 104/Cake/Yourator）"
+            "您好，我是方箏 | Sui 👋\n"
+            "這支 LINE OA 是我打造的「可體驗互動作品集」，用來展示端到端的專案能力；您可以直接點選下方選單操作 Demo。\n\n"
+            "✨ 推薦先玩：\n"
+            "1) 地政圖資自動查詢：輸入段名與地號即可查詢\n"
+            "2) 免費諮商資源查找：傳送定位即可找附近合作機構\n\n"
+            "👇 請點下方選單開始\n"
         )
 
         reply_message(reply_token, [
             {"type": "text", "text": welcome_text},
+            # build_portfolio_qr_text(),
             build_main_menu_flex()
+            
         ])
         return {"ok": True}
 
