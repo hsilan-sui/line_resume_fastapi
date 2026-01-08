@@ -194,7 +194,7 @@ def build_portfolio_carousel():
                             "paddingAll": "0px",
                             "contents": [
                                 build_image_header(
-                                    "https://i.imgur.com/L9uCggH.jpeg",
+                                    "https://pub-1e15d55216a149c193d07024bf1d5269.r2.dev/screenshots/everforest.png",
                                     "後端 Node.js",
                                     "#FF4D8D"
                                 ),
@@ -203,13 +203,16 @@ def build_portfolio_carousel():
                                     "layout": "vertical",
                                     "spacing": "sm",
                                     "paddingAll": "16px",
-                                    "contents": [
-                                        {"type": "text", "text": "Everforest 活動票務系統", "weight": "bold", "size": "lg"},
+                                    "contents": [ 
+                                        {"type": "text", "text": "露營活動票務系統", "weight": "bold", "size": "lg"},
                                         {"type": "separator", "margin": "md"},
 
-                                        {"type": "text", "text": "🧾 活動管理 ➜ 方案 加購 圖片 上架", "size": "sm", "wrap": True, "color": "#6B7280"},
-                                        {"type": "text", "text": "🛒 購票下單 ➜ 訂單流程 額滿控制", "size": "sm", "wrap": True, "color": "#6B7280"},
-                                        {"type": "text", "text": "✅ 通知與驗票 ➜ 信件 票券 核銷", "size": "sm", "wrap": True, "color": "#111827"},
+                                        {"type": "text", "text": "🧾 活動管理 ➜ 活動建立｜上架流程", "size": "sm", "wrap": True, "color": "#6B7280"},
+                                        {"type": "text", "text": "🎟 報名流程 ➜ 方案選擇", "size": "sm", "wrap": True, "color": "#6B7280"},
+                                        {"type": "text", "text": "🛒 購票下單 ➜ 建立訂單｜付款狀態管理", "size": "sm", "wrap": True, "color": "#6B7280"},
+                                        {"type": "text", "text": "✉️ 通知系統 ➜ 訂單成功信｜電子票券信", "size": "sm", "wrap": True, "color": "#6B7280"},
+                                        {"type": "text", "text": "🤖 AI 審查 ➜ 活動上架前檢查：敏感詞｜法規風險｜圖片內容", "size": "sm", "wrap": True, "color": "#6B7280"}
+
                                     ]
                                 }
                             ]
@@ -225,8 +228,21 @@ def build_portfolio_carousel():
                                     "style": "primary",
                                     "color": "#14B8A6",
                                     "height": "sm",
-                                    "action": {"type": "message", "label": "🚀 立即體驗", "text": "露營票務系統"}
-                                }
+                                    "action": {
+                                    "type": "uri",
+                                    "label": "🚀 立即體驗",
+                                    "uri": "https://camping-project-one.vercel.app/"
+                                    }
+                                },                  
+                                {
+                                "type": "button",
+                                "style": "secondary",
+                                "height": "sm",
+                                "action": {
+                                    "type": "uri",
+                                    "label": "📂 查看 GitHub",
+                                    "uri": "https://github.com/hsilan-sui/everforest-backend"
+                                }}
                             ]
                         }
                     },
@@ -241,7 +257,7 @@ def build_portfolio_carousel():
                         "paddingAll": "0px",
                         "contents": [
                             build_image_header(
-                                "https://i.imgur.com/xxxxxxx.jpeg",  # 換成你的截圖或 UI 圖
+                                "https://pub-1e15d55216a149c193d07024bf1d5269.r2.dev/screenshots/line_bot_img.png",  # 換成你的截圖或 UI 圖
                                 "後端 FastAPI",
                                 "#FF4D8D"
                             ),
@@ -251,7 +267,7 @@ def build_portfolio_carousel():
                                 "spacing": "sm",
                                 "paddingAll": "16px",
                                 "contents": [
-                                    {"type": "text", "text": "LINE OA 互動作品集 Demo", "weight": "bold", "size": "lg"},
+                                    {"type": "text", "text": "LINE Bot 互動作品集", "weight": "bold", "size": "lg"},
                                     {"type": "separator", "margin": "md"},
 
                                     {"type": "text", "text": "👋 加入好友 ➜ 自動回歡迎與導覽", "size": "sm", "wrap": True, "color": "#6B7280"},
@@ -272,7 +288,7 @@ def build_portfolio_carousel():
                                 "style": "primary",
                                 "color": "#14B8A6",
                                 "height": "sm",
-                                "action": {"type": "message", "label": "🚀 立即體驗", "text": "LINE OA"}
+                                "action": {"type": "message", "label": "🚀 立即體驗", "text": "welcomeMsg"}
                             }
                         ]
                     }

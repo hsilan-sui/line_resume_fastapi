@@ -47,7 +47,7 @@ def build_resume_flex():
                             # --- 個人定位職稱 ---
                             {
                                 "type": "text",
-                                "text": "Backend / AI Agent Engineer",
+                                "text": "後端工程師 Backend Engineer",
                                 "size": "md",
                                 "color": "#ffffff",
                                 "weight": "bold",
@@ -57,7 +57,7 @@ def build_resume_flex():
                             # --- 技能快速摘要 ---
                             {
                                 "type": "text",
-                                "text": "Node.js｜FastAPI｜Playwright｜AI Agents｜LINE Bot",
+                                "text": "Node.js · FastAPI · Automation · LINE BOT · AI-API串接",
                                 "color": "#ffffffcc",
                                 "size": "sm",
                                 "wrap": True,
@@ -77,7 +77,7 @@ def build_resume_flex():
                                             {"type": "icon", "url": "https://developers-resource.landpress.line.me/fx/img/restaurant_regular_32.png"},
                                             {
                                                 "type": "text",
-                                                "text": "API Automation",
+                                                "text": "後端系統整合與資料流設計",
                                                 "weight": "bold",
                                                 "margin": "sm",
                                                 "flex": 0,
@@ -99,7 +99,7 @@ def build_resume_flex():
                                             {"type": "icon", "url": "https://developers-resource.landpress.line.me/fx/img/restaurant_large_32.png"},
                                             {
                                                 "type": "text",
-                                                "text": "AI Agents",
+                                                "text": "後端服務實作與自動化流程",
                                                 "weight": "bold",
                                                 "margin": "sm",
                                                 "flex": 0,
@@ -290,7 +290,7 @@ def build_resume_flex():
                         },
                         {
                         "type": "text",
-                        "text": "IoT 金流系統 / MQTT / OTA / API 整合",
+                        "text": "MicroPython · IoT 裝置資料系統 · MQTT · OTA · API 整合",
                         "gravity": "center",
                         "flex": 5,
                         "size": "xs",
@@ -336,7 +336,7 @@ def build_resume_flex():
                         },
                         {
                         "type": "text",
-                        "text": "接案｜後端×AI Agent 技能進修",
+                        "text": "接案｜後端系統與 AI 整合實作",
                         "gravity": "center",
                         "flex": 5,
                         "size": "sm",
@@ -383,7 +383,7 @@ def build_resume_flex():
                         },
                         {
                         "type": "text",
-                        "text": "FastAPI / AI Agent / Playwright / LINE Bot",
+                        "text": "FastAPI · Automation · AI Agent · LINE BOT",
                         "gravity": "center",
                         "flex": 5,
                         "size": "xs",
@@ -393,11 +393,36 @@ def build_resume_flex():
                     ],
                     "spacing": "lg",
                     "height": "64px"
+                    },
+                    {
+                    "type": "separator",
+                    "margin": "xl"
+                    },
+                    {
+                    "type": "box",
+                    "layout": "vertical",
+                    "spacing": "sm",
+                    "margin": "lg",
+                    "contents": [
+                        {
+                        "type": "button",
+                        "style": "primary",
+                        "color": "#14B8A6",
+                        "height": "sm",
+                        "action": {
+                            "type": "uri",
+                            "label": "📄 游方箏履歷表",
+                            "uri": "https://drive.google.com/file/d/1Pu2321lWagtWPOlhmKCY8qh0fLT9g0kO/view?usp=sharing"
+                        }
+                        }
+                    ]
                     }
+ 
                 ],
                 "paddingAll": "12px",
                 "spacing": "md"
-                }
+                },
+                
 
         }
     }

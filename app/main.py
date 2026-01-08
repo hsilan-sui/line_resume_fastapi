@@ -27,3 +27,5 @@ app.include_router(landinfo_router)
 @app.get("/")
 async def root():
     return {"message": "FastAPI LINE Bot is running"}
+
+

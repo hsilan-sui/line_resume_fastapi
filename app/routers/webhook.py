@@ -22,6 +22,9 @@ from app.line.flex_builder.landinfo_entry_flexmsg import build_landinfo_entry_fl
 from app.line.quickbtn.landinfo_quickreply import build_landinfo_quickreply
 from app.line.quickbtn.main_quickreply import build_portfolio_quickreply
 from app.line.richmenu import ensure_user_has_home_richmenu
+from app.line.messages.home_entry import build_home_entry_messages
+from app.line.flex_builder.resume_image import build_quick_resume_image_flex
+
 
 router = APIRouter()
 
@@ -76,21 +79,22 @@ async def webhook(request: Request):
                 await ensure_user_has_home_richmenu(user_id)
             except Exception as e:
                 print("[richmenu] link failed:", repr(e))
-        welcome_text = (
-            "您好，我是方箏 | Sui 👋\n"
-            "這支 LINE OA 是我打造的「可體驗互動作品集」，用來展示端到端的專案能力；您可以直接點選下方選單操作 Demo。\n\n"
-            "✨ 推薦先玩：\n"
-            "1) 地政圖資自動查詢：輸入段名與地號即可查詢\n"
-            "2) 免費諮商資源查找：傳送定位即可找附近合作機構\n\n"
-            "👇 請點下方選單開始\n"
-        )
+        reply_message(reply_token, build_home_entry_messages())
+        # welcome_text = (
+        #     "您好，我是方箏 | Sui 👋\n"
+        #     "這支 LINE OA 是我打造的「可體驗互動作品集」，用來展示端到端的專案能力；您可以直接點選下方選單操作 Demo。\n\n"
+        #     "✨ 推薦先玩：\n"
+        #     "1) 地政圖資自動查詢：輸入段名與地號即可查詢\n"
+        #     "2) 免費諮商資源查找：傳送定位即可找附近合作機構\n\n"
+        #     "👇 請點下方選單開始\n"
+        # )
 
-        reply_message(reply_token, [
-            {"type": "text", "text": welcome_text},
-            # build_portfolio_qr_text(),
-            build_main_menu_flex()
+        # reply_message(reply_token, [
+        #     {"type": "text", "text": welcome_text},
+        #     # build_portfolio_qr_text(),
+        #     build_main_menu_flex()
             
-        ])
+        # ])
         return {"ok": True}
 
     # 1️⃣ 忽略非 message event
@@ -143,6 +147,8 @@ async def webhook(request: Request):
         # ✅ 指令路由表（只處理「固定指令」）
         # =========================
         COMMAND_ROUTES = {
+            "welcomeMsg": lambda: build_home_entry_messages(),
+            "welcomemsg": lambda: build_home_entry_messages(),
             "作品集": lambda: build_portfolio_carousel(),
             "履歷": lambda: build_resume_flex(),
             "LINE名片": lambda: build_resume_flex(),
@@ -186,6 +192,11 @@ async def webhook(request: Request):
             "LINEOA作品集": lambda: {
                 "type": "text",
                 "text": "🤖 LINE OA 互動作品集（FastAPI）\nRepo：<貼連結>"
+            },
+            "聯繫我": lambda: {
+                "type": "flex",
+                "altText": "游方箏履歷表",
+                "contents": build_quick_resume_image_flex()
             },
 
             "GitHub": lambda: {"type": "text", "text": "GitHub：<貼你的 GitHub>"},

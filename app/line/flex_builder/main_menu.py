@@ -35,7 +35,7 @@ def build_main_menu_flex():
                         "layout": "vertical",
                         "spacing": "xs",
                         "contents": [
-                            {"type": "text", "text": "Sui｜互動作品集", "weight": "bold", "size": "xl", "wrap": True},
+                            {"type": "text", "text": "Sui｜LINE OA 互動作品集", "weight": "bold", "size": "xl", "wrap": True},
                             {
                                 "type": "text",
                                 "text": "點一下就能體驗 Demo（桌機可直接輸入指令）",
