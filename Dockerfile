@@ -19,8 +19,8 @@ RUN poetry install --only main --no-root --no-ansi
 
 COPY app ./app
 COPY data ./data
-COPY public ./public
 COPY scripts ./scripts
+RUN mkdir -p ./public
 
 EXPOSE 3000
 
