@@ -1,3 +1,19 @@
 .env
+.env.*
+!.env.example
+
+.DS_Store
+__pycache__/
+*.py[cod]
 
 public/
+
+# Monorepo service hygiene
+services/**/.env
+services/**/.env.*
+!services/**/.env.example
+services/**/.git/
+services/**/node_modules/
+services/**/services/public/
+services/**/cloudflared/
+services/**/.DS_Store

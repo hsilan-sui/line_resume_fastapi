@@ -1,0 +1,121 @@
+name: line-resume-stack
+
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  fastapi:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ${STACK_ENV_FILE:-.env}
+    environment:
+      NODE_LANDINFO_URL: http://landinfo-server:3001
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "${FASTAPI_BIND:-127.0.0.1}:${FASTAPI_PORT:-3000}:3000"
+    depends_on:
+      redis:
+        condition: service_healthy
+      landinfo-server:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:3000/', timeout=3)\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  landinfo-server:
+    build:
+      context: ../../services/landinfo_api
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ${STACK_ENV_FILE:-.env}
+    environment:
+      NODE_LANDINFO_PORT: 3001
+      REDIS_URL: redis://redis:6379/0
+      HEADLESS: "true"
+    volumes:
+      - landinfo-public:/app/services/public
+    command: ["npm", "run", "start:server"]
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:3001/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  landinfo-worker:
+    build:
+      context: ../../services/landinfo_api
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ${STACK_ENV_FILE:-.env}
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      HEADLESS: "true"
+      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-1}
+    volumes:
+      - landinfo-public:/app/services/public
+    command: ["npm", "run", "start:worker"]
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    profiles: ["tunnel"]
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARED_TOKEN}
+    depends_on:
+      fastapi:
+        condition: service_started
+
+  ngrok:
+    image: ngrok/ngrok:alpine
+    restart: unless-stopped
+    profiles: ["ngrok"]
+    command: http --web-addr=0.0.0.0:4040 fastapi:3000
+    environment:
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
+    depends_on:
+      fastapi:
+        condition: service_started
+
+  ngrok-notifier:
+    image: python:3.14-alpine
+    restart: unless-stopped
+    profiles: ["ngrok"]
+    working_dir: /app
+    command: ["python", "/app/ngrok_notifier.py"]
+    environment:
+      NGROK_API_URL: http://ngrok:4040/api/tunnels
+      NGROK_NOTIFY_WEBHOOK_PATH: ${NGROK_NOTIFY_WEBHOOK_PATH:-/webhook}
+      NGROK_NOTIFY_POLL_SECONDS: ${NGROK_NOTIFY_POLL_SECONDS:-30}
+      DISCORD_WEBHOOK_URL: ${DISCORD_WEBHOOK_URL}
+    volumes:
+      - ./ngrok_notifier.py:/app/ngrok_notifier.py:ro
+      - ngrok-notifier-state:/state
+    depends_on:
+      ngrok:
+        condition: service_started
+
+volumes:
+  redis-data:
+  landinfo-public:
+  ngrok-notifier-state:

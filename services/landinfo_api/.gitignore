@@ -1,0 +1,13 @@
+# .gitignore
+.env
+
+services/public/
+# state/
+cloudflared/
+# easymap.json
+
+# data/
+
+node_modules/
+
+.env.prod
