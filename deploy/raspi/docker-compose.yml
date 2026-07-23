@@ -90,12 +90,20 @@ services:
     image: ngrok/ngrok:alpine
     restart: unless-stopped
     profiles: ["ngrok"]
-    command: http --web-addr=0.0.0.0:4040 fastapi:3000
+    command:
+      - --config
+      - /etc/ngrok.yml
+      - http
+      - http://fastapi:3000
+      - --log
+      - stdout
     environment:
       NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
+    volumes:
+      - ./ngrok.yml:/etc/ngrok.yml:ro
     depends_on:
       fastapi:
-        condition: service_started
+        condition: service_healthy
 
   ngrok-notifier:
     image: python:3.14-alpine

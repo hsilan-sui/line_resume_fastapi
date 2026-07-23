@@ -113,6 +113,11 @@ docker compose logs -f ngrok
 ```
 
 ngrok free URLs change; Cloudflare Tunnel is better for always-on service.
+The ngrok Agent API is exposed to other containers through `ngrok.yml`:
+
+```yaml
+web_addr: 0.0.0.0:4040
+```
 
 ### ngrok Discord Notifier
 
