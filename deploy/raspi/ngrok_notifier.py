@@ -5,6 +5,7 @@ import urllib.error
 import urllib.request
 
 
+NOTIFIER_VERSION = "2026-07-23.2"
 NGROK_API_URL = os.getenv("NGROK_API_URL", "http://ngrok:4040/api/tunnels")
 DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL", "").strip()
 WEBHOOK_PATH = os.getenv("NGROK_NOTIFY_WEBHOOK_PATH", "/webhook")
@@ -76,8 +77,10 @@ def write_last_url(url):
             os.fsync(f.fileno())
         os.replace(tmp_file, STATE_FILE)
         print("[ngrok-notifier] wrote state:", normalized)
+        return True
     except OSError as e:
         print("[ngrok-notifier] cannot write state:", repr(e))
+        return False
 
 
 def first_https_tunnel(data):
@@ -89,7 +92,9 @@ def first_https_tunnel(data):
 
 
 def main():
+    print("[ngrok-notifier] version:", NOTIFIER_VERSION)
     print("[ngrok-notifier] waiting for ngrok tunnel:", NGROK_API_URL)
+    print("[ngrok-notifier] state file:", STATE_FILE)
     last_url = read_last_url()
 
     while True:
@@ -108,7 +113,10 @@ def main():
                     "Update this in LINE Developers > Messaging API > Webhook URL."
                 )
                 last_url = public_url
-                write_last_url(public_url)
+                if not write_last_url(public_url):
+                    print("[ngrok-notifier] state write failed; Discord notification suppressed")
+                    time.sleep(POLL_SECONDS)
+                    continue
                 if post_discord(message):
                     print("[ngrok-notifier] sent Discord notification:", webhook_url)
                 else:
