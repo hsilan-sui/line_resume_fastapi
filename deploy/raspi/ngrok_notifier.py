@@ -9,7 +9,8 @@ NGROK_API_URL = os.getenv("NGROK_API_URL", "http://ngrok:4040/api/tunnels")
 DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL", "").strip()
 WEBHOOK_PATH = os.getenv("NGROK_NOTIFY_WEBHOOK_PATH", "/webhook")
 POLL_SECONDS = int(os.getenv("NGROK_NOTIFY_POLL_SECONDS", "30"))
-STATE_FILE = os.getenv("NGROK_NOTIFY_STATE_FILE", "/state/last_url")
+STATE_FILE = os.getenv("NGROK_NOTIFY_STATE_FILE", "/state/last_url.txt")
+LEGACY_STATE_FILE = "/state/last_url"
 
 
 def normalize_public_url(url):
@@ -47,26 +48,33 @@ def post_discord(content):
 
 
 def read_last_url():
-    try:
-        with open(STATE_FILE, "r", encoding="utf-8") as f:
-            value = normalize_public_url(f.read())
-            if value:
-                print("[ngrok-notifier] loaded state:", value)
-            return value
-    except FileNotFoundError:
-        print("[ngrok-notifier] no previous state")
-        return ""
-    except OSError as e:
-        print("[ngrok-notifier] cannot read state:", repr(e))
-        return ""
+    for path in (STATE_FILE, LEGACY_STATE_FILE):
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                value = normalize_public_url(f.read())
+                if value:
+                    print(f"[ngrok-notifier] loaded state from {path}:", value)
+                return value
+        except FileNotFoundError:
+            continue
+        except OSError as e:
+            print(f"[ngrok-notifier] cannot read state from {path}:", repr(e))
+            return ""
+
+    print("[ngrok-notifier] no previous state")
+    return ""
 
 
 def write_last_url(url):
     normalized = normalize_public_url(url)
+    tmp_file = f"{STATE_FILE}.tmp"
     try:
         os.makedirs(os.path.dirname(STATE_FILE), exist_ok=True)
-        with open(STATE_FILE, "w", encoding="utf-8") as f:
+        with open(tmp_file, "w", encoding="utf-8") as f:
             f.write(normalized)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp_file, STATE_FILE)
         print("[ngrok-notifier] wrote state:", normalized)
     except OSError as e:
         print("[ngrok-notifier] cannot write state:", repr(e))
@@ -92,19 +100,19 @@ def main():
                 print("[ngrok-notifier] no https tunnel yet")
             elif public_url != last_url:
                 webhook_url = f"{public_url}{WEBHOOK_PATH}"
+                print(f"[ngrok-notifier] URL changed: previous={last_url or '<empty>'} current={public_url}")
                 message = (
                     "ngrok URL changed for LINE Bot\n"
                     f"Public URL: {public_url}\n"
                     f"LINE Webhook URL: {webhook_url}\n"
                     "Update this in LINE Developers > Messaging API > Webhook URL."
                 )
+                last_url = public_url
+                write_last_url(public_url)
                 if post_discord(message):
                     print("[ngrok-notifier] sent Discord notification:", webhook_url)
-                    last_url = public_url
-                    write_last_url(public_url)
                 else:
-                    last_url = public_url
-                    print("[ngrok-notifier] skipped Discord send; suppressing duplicate for current process")
+                    print("[ngrok-notifier] skipped Discord send; state already updated to suppress duplicates")
             else:
                 print("[ngrok-notifier] tunnel unchanged:", public_url)
         except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as e:
