@@ -26,7 +26,10 @@ def post_discord(content):
     req = urllib.request.Request(
         DISCORD_WEBHOOK_URL,
         data=body,
-        headers={"content-type": "application/json"},
+        headers={
+            "content-type": "application/json",
+            "User-Agent": "Mozilla/5.0 ngrok-notifier/1.0",
+        },
         method="POST",
     )
     with urllib.request.urlopen(req, timeout=10) as response:
@@ -37,15 +40,26 @@ def post_discord(content):
 def read_last_url():
     try:
         with open(STATE_FILE, "r", encoding="utf-8") as f:
-            return f.read().strip()
+            value = f.read().strip()
+            if value:
+                print("[ngrok-notifier] loaded state:", value)
+            return value
     except FileNotFoundError:
+        print("[ngrok-notifier] no previous state")
+        return ""
+    except OSError as e:
+        print("[ngrok-notifier] cannot read state:", repr(e))
         return ""
 
 
 def write_last_url(url):
-    os.makedirs(os.path.dirname(STATE_FILE), exist_ok=True)
-    with open(STATE_FILE, "w", encoding="utf-8") as f:
-        f.write(url)
+    try:
+        os.makedirs(os.path.dirname(STATE_FILE), exist_ok=True)
+        with open(STATE_FILE, "w", encoding="utf-8") as f:
+            f.write(url)
+        print("[ngrok-notifier] wrote state:", url)
+    except OSError as e:
+        print("[ngrok-notifier] cannot write state:", repr(e))
 
 
 def first_https_tunnel(data):
@@ -78,6 +92,9 @@ def main():
                     print("[ngrok-notifier] sent Discord notification:", webhook_url)
                     last_url = public_url
                     write_last_url(public_url)
+                else:
+                    last_url = public_url
+                    print("[ngrok-notifier] skipped Discord send; suppressing duplicate for current process")
             else:
                 print("[ngrok-notifier] tunnel unchanged:", public_url)
         except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as e:
