@@ -126,8 +126,25 @@ async def webhook(request: Request):
 
         reply_message(reply_token, payload)
         return {"ok": True}
+    # -------------------------------------------------
+    # 公仔辨識結帳 Demo
+    # -------------------------------------------------
+    if msg_type == "image":
+        print("👉 收到圖片訊息（Demo）")
 
+        demo_text = (
+            "🧸 公仔辨識完成（Demo）\n"
+            "皮卡丘 x1（300）\n"
+            "傑尼龜 x2（250）\n\n"
+            "💰 總金額：800 元\n"
+            "狀態：可結帳\n\n"
+            "📌 說明：目前為 Demo，模型仍在調整中"
+        )
 
+        reply_message(reply_token, [
+            {"type": "text", "text": demo_text}
+        ])
+        return {"ok": True}
 
     # -------------------------------------------------
     # 3️⃣ 處理文字

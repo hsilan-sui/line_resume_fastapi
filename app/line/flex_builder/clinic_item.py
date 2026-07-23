@@ -173,13 +173,13 @@ def build_clinic_flex_item(c):
                 },
 
                 ### 更新日期 => 讓使用者知道資料新不新
-                # {
-                #     "type": "text",
-                #     "text": f"更新：{c['edit_date']}",
-                #     "size": "xs",
-                #     "margin": "md",
-                #     "color": "#9ca3af"
-                # }
+                {
+                    "type": "text",
+                    "text": f"更新：{c['edit_date']}",
+                    "size": "xs",
+                    "margin": "md",
+                    "color": "#9ca3af"
+                }
             ]
         },
 
