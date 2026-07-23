@@ -12,6 +12,15 @@ POLL_SECONDS = int(os.getenv("NGROK_NOTIFY_POLL_SECONDS", "30"))
 STATE_FILE = os.getenv("NGROK_NOTIFY_STATE_FILE", "/state/last_url")
 
 
+def normalize_public_url(url):
+    value = str(url or "").strip().rstrip("/")
+    if not value:
+        return ""
+    if value.endswith(WEBHOOK_PATH):
+        value = value[: -len(WEBHOOK_PATH)]
+    return value.rstrip("/")
+
+
 def request_json(url):
     with urllib.request.urlopen(url, timeout=10) as response:
         return json.loads(response.read().decode("utf-8"))
@@ -40,7 +49,7 @@ def post_discord(content):
 def read_last_url():
     try:
         with open(STATE_FILE, "r", encoding="utf-8") as f:
-            value = f.read().strip()
+            value = normalize_public_url(f.read())
             if value:
                 print("[ngrok-notifier] loaded state:", value)
             return value
@@ -53,20 +62,21 @@ def read_last_url():
 
 
 def write_last_url(url):
+    normalized = normalize_public_url(url)
     try:
         os.makedirs(os.path.dirname(STATE_FILE), exist_ok=True)
         with open(STATE_FILE, "w", encoding="utf-8") as f:
-            f.write(url)
-        print("[ngrok-notifier] wrote state:", url)
+            f.write(normalized)
+        print("[ngrok-notifier] wrote state:", normalized)
     except OSError as e:
         print("[ngrok-notifier] cannot write state:", repr(e))
 
 
 def first_https_tunnel(data):
     for tunnel in data.get("tunnels", []):
-        public_url = str(tunnel.get("public_url", "")).strip()
+        public_url = normalize_public_url(tunnel.get("public_url", ""))
         if public_url.startswith("https://"):
-            return public_url.rstrip("/")
+            return public_url
     return ""
 
 
